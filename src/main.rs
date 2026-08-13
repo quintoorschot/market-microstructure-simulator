@@ -1,3 +1,15 @@
+mod order;
+
+use order::*;
+
 fn main() {
-    println!("Hello, world!");
+
+    let order = Order {
+        id: 1,
+        price: 10_000,
+        quantity: 10,
+        side: Side::Buy,
+    };
+
+    println!("{:#?}", order);
 }
