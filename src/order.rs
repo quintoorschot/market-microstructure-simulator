@@ -14,6 +14,14 @@ pub struct Order {
     pub side: Side,
 }
 
+impl Order {
+
+    fn price_decimal(&self) -> f64 {
+        self.price as f64 / 100.0
+    }
+
+}
+
 impl fmt::Display for Order {
 
     fn fmt(
@@ -31,7 +39,7 @@ impl fmt::Display for Order {
             "{} {} @ {:.2} (order_id={})",
             side,
             self.quantity,
-            self.price as f64 / 100.0,
+            self.price_decimal(),
             self.id,
         )
 
