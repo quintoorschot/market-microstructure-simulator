@@ -31,7 +31,7 @@ impl fmt::Display for Order {
             "{} {} @ {:.2} (order_id={})",
             side,
             self.quantity,
-            self.price,
+            self.price as f64 / 100.0,
             self.id,
         )
 
