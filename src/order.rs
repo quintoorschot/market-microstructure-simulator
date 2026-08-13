@@ -1,3 +1,5 @@
+use core::fmt;
+
 #[derive(Debug)]
 pub enum Side {
     Buy,
@@ -10,4 +12,29 @@ pub struct Order {
     pub price: i64,
     pub quantity: u64,
     pub side: Side,
+}
+
+impl fmt::Display for Order {
+
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>
+    ) -> fmt::Result {
+
+        let side = match self.side {
+            Side::Buy => "BUY",
+            Side::Sell => "SELL",
+        };
+
+        write!(
+            f,
+            "{} {} @ {:.2} (order_id={})",
+            side,
+            self.quantity,
+            self.price,
+            self.id,
+        )
+
+    }
+
 }

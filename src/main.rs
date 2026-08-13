@@ -11,5 +11,5 @@ fn main() {
         side: Side::Buy,
     };
 
-    println!("{:#?}", order);
+    println!("{}", order);
 }
