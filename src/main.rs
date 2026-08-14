@@ -1,8 +1,12 @@
 mod order;
+mod orderbook;
 
 use order::*;
+use orderbook::*;
 
 fn main() {
+
+    let mut orderbook = OrderBook::new();
 
     let order = Order {
         id: 1,
@@ -12,5 +16,7 @@ fn main() {
         timestamp: 100,
     };
 
-    println!("{}", order);
+    orderbook.add_order(order);
+
+    println!("{:?}", orderbook);
 }
