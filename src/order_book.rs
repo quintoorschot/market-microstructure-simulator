@@ -2,7 +2,11 @@ use core::fmt;
 use std::collections::BTreeMap;
 use crate::order::{Side, Order};
 
-#[derive(Debug)]
+
+/// Stores resting orders that provide liquidity for the matching engine.
+///
+/// The order book maintains buy and sell orders grouped by price level.
+/// It is responsible for storing and retrieving resting liquidity.
 pub struct OrderBook {
 
     // Price => Orders at that price
@@ -19,7 +23,7 @@ impl OrderBook {
         }
     }
 
-    
+
     /// Store a resting order in the order book.
     pub fn store_order(&mut self, order: Order) {
 
