@@ -16,7 +16,7 @@ fn main() {
         timestamp: 100,
     };
 
-    orderbook.add_order(order);
+    orderbook.store_order(order);
 
     println!("{}", orderbook);
 }

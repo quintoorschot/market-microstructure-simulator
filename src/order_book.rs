@@ -19,7 +19,10 @@ impl OrderBook {
         }
     }
 
-    pub fn add_order(&mut self, order: Order) {
+    
+    /// Store a resting order in the order book.
+    pub fn store_order(&mut self, order: Order) {
+
         match &order.side {
             Side::Buy => {
                 self.bids
