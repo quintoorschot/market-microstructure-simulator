@@ -1,3 +1,4 @@
+use core::fmt;
 use std::collections::BTreeMap;
 use crate::order::{Side, Order};
 
@@ -34,6 +35,51 @@ impl OrderBook {
                     .push(order);
             }
         }
+    }
+
+}
+
+
+fn write_side(
+    f: &mut fmt::Formatter<'_>,
+    side: &str,
+    levels: &BTreeMap<i64, Vec<Order>>,
+) -> fmt::Result {
+
+    for (price, orders) in levels {
+        let total_quantity: u64 = orders
+            .iter()
+            .map(|o| o.quantity)
+            .sum();
+
+        writeln!(
+            f,
+            "{} {:>8.2} | {} order(s) | qty {}",
+            side,
+            *price as f64 / 100.0,
+            orders.len(),
+            total_quantity,
+        )?;
+    }
+
+    Ok(())
+}
+
+
+impl fmt::Display for OrderBook {
+    
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>
+    ) -> fmt::Result {
+
+        writeln!(f, "============== BIDS ==============")?;
+        write_side(f, "BUY", &self.bids)?;
+
+        writeln!(f, "\n============== ASKS ==============")?;
+        write_side(f, "SELL", &self.asks)?;
+
+        Ok(())
     }
 
 }

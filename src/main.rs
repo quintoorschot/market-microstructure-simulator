@@ -18,5 +18,5 @@ fn main() {
 
     orderbook.add_order(order);
 
-    println!("{:?}", orderbook);
+    println!("{}", orderbook);
 }
