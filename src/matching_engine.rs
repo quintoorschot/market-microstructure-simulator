@@ -7,9 +7,8 @@ pub struct ExecutionResult {
     pub remaining_order: Option<Order>,
 }
 
-
 pub struct MatchingEngine {
-    pub orderbook: OrderBook,
+    orderbook: OrderBook,
 }
 
 impl MatchingEngine {
@@ -23,12 +22,19 @@ impl MatchingEngine {
     pub fn submit_order(&mut self, order: Order) -> ExecutionResult {
 
         let mut trades: Vec<Trade> = Vec::new();
+
+        
+
         self.orderbook.store_order(order);
 
         ExecutionResult {
             trades,
             remaining_order: None,
         }
+    }
+
+    pub fn display_order_book(&self) -> () {
+        println!("{}", self.orderbook)
     }
 
 }

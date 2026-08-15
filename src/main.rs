@@ -11,7 +11,7 @@ fn main() {
 
     let mut matching_engine = MatchingEngine::new();
 
-    let order = Order {
+    let order_1 = Order {
         id: 1,
         price: 10000,
         quantity: 10,
@@ -19,7 +19,16 @@ fn main() {
         timestamp: 100,
     };
 
-    matching_engine.submit_order(order);
+    let order_2 = Order {
+        id: 1,
+        price: 10000,
+        quantity: 8,
+        side: Side::Sell,
+        timestamp: 100,
+    };
 
-    println!("{}", matching_engine.orderbook);
+    matching_engine.submit_order(order_1);
+    matching_engine.submit_order(order_2);
+
+    matching_engine.display_order_book();
 }
