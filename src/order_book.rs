@@ -44,6 +44,16 @@ impl OrderBook {
         }
     }
 
+    /// Returns the best (highest) bid price if it exists, otherwise returns None.
+    pub fn best_bid(&self) -> Option<&i64> {
+        self.bids.keys().next_back()
+    }
+
+    /// Returns the best (lowest) ask price if it exists, otherwise returns None.
+    pub fn best_ask(&self) -> Option<&i64> {
+        self.asks.keys().next()
+    }
+
 }
 
 
