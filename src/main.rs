@@ -1,12 +1,15 @@
 mod order;
 mod order_book;
+mod matching_engine;
+mod trade;
 
 use order::*;
 use order_book::*;
+use matching_engine::*;
 
 fn main() {
 
-    let mut orderbook = OrderBook::new();
+    let mut matching_engine = MatchingEngine::new();
 
     let order = Order {
         id: 1,
@@ -16,7 +19,7 @@ fn main() {
         timestamp: 100,
     };
 
-    orderbook.store_order(order);
+    matching_engine.submit_order(order);
 
-    println!("{}", orderbook);
+    println!("{}", matching_engine.orderbook);
 }
