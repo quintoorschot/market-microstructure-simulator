@@ -13,17 +13,17 @@ fn main() {
 
     let order_1 = Order {
         id: 1,
-        price: 10000,
+        price: 10002,
         quantity: 10,
-        side: Side::Sell,
+        side: Side::Buy,
         timestamp: 100,
     };
 
     let order_2 = Order {
         id: 2,
-        price: 10002,
+        price: 10000,
         quantity: 5,
-        side: Side::Buy,
+        side: Side::Sell,
         timestamp: 110,
     };
 
