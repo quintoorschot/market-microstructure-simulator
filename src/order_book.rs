@@ -107,7 +107,7 @@ impl OrderBook {
         trade
     }
 
-    fn match_against_bids(&self, incoming: &mut Order) -> Trade {
+    fn match_against_bids(&mut self, incoming: &mut Order) -> Trade {
         let price = self
             .best_bid()
             .copied()
@@ -115,7 +115,7 @@ impl OrderBook {
 
         let (trade, remove_price_level) = {
             let queue = self
-                .asks
+                .bids
                 .get_mut(&price)
                 .expect("Best bid price must exist in bids.");
 
