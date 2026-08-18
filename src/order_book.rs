@@ -1,12 +1,13 @@
 use core::fmt;
 use std::collections::BTreeMap;
-use crate::order::{Side, Order};
+use crate::{order::{Order, Side}, trade::Trade};
 
 
 /// Stores resting orders that provide liquidity for the matching engine.
 ///
 /// The order book maintains buy and sell orders grouped by price level.
 /// It is responsible for storing and retrieving resting liquidity.
+#[derive(PartialEq, Debug)]
 pub struct OrderBook {
 
     // Price => Orders at that price
@@ -52,6 +53,62 @@ impl OrderBook {
     /// Returns the best (lowest) ask price if it exists, otherwise returns None.
     pub fn best_ask(&self) -> Option<&i64> {
         self.asks.keys().next()
+    }
+
+    pub(crate) fn match_at_best(&mut self, incoming: &mut Order) -> Trade {
+        match incoming.side {
+            Side::Buy => self.match_against_asks(incoming),
+            Side::Sell => self.match_against_bids(incoming),
+        }
+    }
+
+    fn match_against_asks(&mut self, incoming: &mut Order) -> Trade {
+        let price = self
+            .best_ask()
+            .copied()
+            .expect("match_against_asks called without asks in the order book.");
+
+        let (trade, remove_price_level) = {
+            let queue = self
+                .asks
+                .get_mut(&price)
+                .expect("Best ask price must exist in asks.");
+
+            let resting = queue
+                .first_mut()
+                .expect("Price level must have at least one resting order.");
+
+            let quantity = incoming.quantity.min(resting.quantity);
+
+            incoming.quantity -= quantity;
+            resting.quantity -= quantity;
+
+            let trade = Trade {
+                incoming_order_id: incoming.id,
+                resting_order_id: resting.id,
+                price,
+                quantity,
+            };
+
+            // Remove 'resting' from queue when no longer needed.
+            if queue[0].quantity == 0 {
+                queue.remove(0);
+            }
+
+            let remove_price_level = queue.is_empty();
+
+            (trade, remove_price_level)
+        };
+
+        if remove_price_level {
+            self.asks.remove(&price);
+        }
+
+        trade
+    }
+
+    fn match_against_bids(&self, order: &mut Order) -> Trade {
+        todo!();
     }
 
 }

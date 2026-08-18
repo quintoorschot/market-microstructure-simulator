@@ -1,12 +1,12 @@
 use core::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Side {
     Buy,
     Sell,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Order {
     pub id: u64,
     pub price: i64,     // Price in ticks (e.g. 10050 = $100.50)

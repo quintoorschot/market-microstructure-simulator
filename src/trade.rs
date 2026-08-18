@@ -1,4 +1,6 @@
 pub struct Trade {
-    price: i64,
-    quantity: u64
+    pub incoming_order_id: u64,
+    pub resting_order_id: u64,
+    pub price: i64,
+    pub quantity: u64
 }
