@@ -107,8 +107,49 @@ impl OrderBook {
         trade
     }
 
-    fn match_against_bids(&self, order: &mut Order) -> Trade {
-        todo!();
+    fn match_against_bids(&self, incoming: &mut Order) -> Trade {
+        let price = self
+            .best_bid()
+            .copied()
+            .expect("match_against_bids called without bids in the order book.");
+
+        let (trade, remove_price_level) = {
+            let queue = self
+                .asks
+                .get_mut(&price)
+                .expect("Best bid price must exist in bids.");
+
+            let resting = queue
+                .first_mut()
+                .expect("Price level must have at least one resting order.");
+
+            let quantity = incoming.quantity.min(resting.quantity);
+
+            incoming.quantity -= quantity;
+            resting.quantity -= quantity;
+
+            let trade = Trade {
+                incoming_order_id: incoming.id,
+                resting_order_id: resting.id,
+                price,
+                quantity,
+            };
+
+            // Remove 'resting' from queue when no longer needed.
+            if queue[0].quantity == 0 {
+                queue.remove(0);
+            }
+
+            let remove_price_level = queue.is_empty();
+
+            (trade, remove_price_level)
+        };
+
+        if remove_price_level {
+            self.asks.remove(&price);
+        }
+
+        trade
     }
 
 }
