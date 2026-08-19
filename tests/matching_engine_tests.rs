@@ -161,3 +161,30 @@ fn cancel_target_order_from_multiple_orders() -> () {
     // Check if order got cancelled and removed from orderbook.
     assert_eq!(matching_engine.orderbook, expected_orderbook);
 }
+
+#[test]
+fn cancel_nonexisting_order() -> () {
+    let mut matching_engine = MatchingEngine::new();
+
+    let order = Order {
+        id: 0,
+        price: 10000,
+        quantity: 25,
+        side: Side::Sell,
+        timestamp: 100,
+    };
+
+    // Assumes submit_order works as intended.
+    matching_engine.submit_order(order);
+
+    let cancel_result = matching_engine.cancel_order(1);
+
+    // Check if cancellation was succesful.
+    assert_eq!(cancel_result, false);
+
+    let mut expected_orderbook = OrderBook::new();
+    expected_orderbook.store_order(order);
+
+    // Existing non-matching orders should not be removed.
+    assert_eq!(matching_engine.orderbook, expected_orderbook);
+}
