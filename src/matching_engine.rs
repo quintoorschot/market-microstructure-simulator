@@ -55,6 +55,31 @@ impl MatchingEngine {
         trades
     }
 
+    /// Cancel standing order using the order's id.
+    pub fn cancel_order(&mut self, id: u64) -> bool {
+
+        let (order_cancelled, empty_price) = 'search: {
+            for (price, price_level) in self.orderbook.bids.iter_mut() {
+                if let Some(index) = price_level.iter().position(|order| order.id == id) {
+                    price_level.remove(index);
+
+                    println!("{:?}", price_level);
+                    if price_level.is_empty() {
+                        break 'search (true, Some(*price));
+                    }
+                    break 'search (true, None)
+                }
+            }
+            break 'search (false, None)
+        };
+
+        if let Some(price) = empty_price {
+            self.orderbook.bids.remove(&price);
+        }
+
+        order_cancelled
+    }
+
     pub fn display_order_book(&self) -> () {
         println!("{}", self.orderbook)
     }

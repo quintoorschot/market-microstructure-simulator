@@ -30,8 +30,10 @@ fn main() {
 
     matching_engine.submit_order(order_1);
     println!("Order 1 submitted!");
-    matching_engine.submit_order(order_2);
-    println!("Order 2 submitted!");
+
+    matching_engine.cancel_order(1);
+    // matching_engine.submit_order(order_2);
+    // println!("Order 2 submitted!");
 
     matching_engine.display_order_book();
 }
