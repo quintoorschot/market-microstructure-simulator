@@ -146,7 +146,7 @@ impl OrderBook {
         };
 
         if remove_price_level {
-            self.asks.remove(&price);
+            self.bids.remove(&price);
         }
 
         trade
