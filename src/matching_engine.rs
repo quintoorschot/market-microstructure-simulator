@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use crate::{order_book::OrderBook, trade::Trade};
 use crate::order::{Order, Side};
 
@@ -55,26 +57,35 @@ impl MatchingEngine {
         trades
     }
 
+
     /// Cancel standing order using the order's id.
     pub fn cancel_order(&mut self, id: u64) -> bool {
 
+        if Self::cancel_on_side(&mut self.orderbook.bids, id) {
+            return true;
+        }
+        Self::cancel_on_side(&mut self.orderbook.asks, id)
+    }
+
+    fn cancel_on_side(side: &mut BTreeMap<i64, Vec<Order>>, id: u64) -> bool {
+
         let (order_cancelled, empty_price) = 'search: {
-            for (price, price_level) in self.orderbook.bids.iter_mut() {
+            for (price, price_level) in side.iter_mut() {
                 if let Some(index) = price_level.iter().position(|order| order.id == id) {
                     price_level.remove(index);
 
-                    println!("{:?}", price_level);
                     if price_level.is_empty() {
                         break 'search (true, Some(*price));
                     }
                     break 'search (true, None)
                 }
             }
+
             break 'search (false, None)
         };
 
         if let Some(price) = empty_price {
-            self.orderbook.bids.remove(&price);
+            side.remove(&price);
         }
 
         order_cancelled
