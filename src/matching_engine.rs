@@ -67,6 +67,7 @@ impl MatchingEngine {
         Self::cancel_on_side(&mut self.orderbook.asks, id)
     }
 
+    /// Auxiliary function of `cancel_order` to cancel order on a specific side of the order book.
     fn cancel_on_side(side: &mut BTreeMap<i64, Vec<Order>>, id: u64) -> bool {
 
         let (order_cancelled, empty_price) = 'search: {
