@@ -92,6 +92,8 @@ impl MatchingEngine {
         order_cancelled
     }
 
+
+    /// Display the matching engine's standing orders by printing the order book.
     pub fn display_order_book(&self) -> () {
         println!("{}", self.orderbook)
     }
