@@ -16,7 +16,6 @@ fn main() {
         price: 10002,
         quantity: 10,
         side: Side::Buy,
-        timestamp: 100,
     };
 
     let order_2 = Order {
@@ -24,7 +23,6 @@ fn main() {
         price: 10000,
         quantity: 5,
         side: Side::Sell,
-        timestamp: 110,
     };
 
 

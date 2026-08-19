@@ -25,7 +25,6 @@ fn test_best_bid_with_buy_entries_only() -> () {
             price,
             quantity: 25,
             side: Side::Buy,
-            timestamp: id as u64 * 20
         });
     }
 
@@ -50,7 +49,6 @@ fn test_best_bid_with_mixed_entries() -> () {
             price,
             quantity: 25,
             side,
-            timestamp: id as u64 * 20
         });
     }
 
@@ -82,7 +80,6 @@ fn test_best_ask_with_sell_entries_only() -> () {
             price,
             quantity: 25,
             side: Side::Sell,
-            timestamp: id * 20
         });
     }
 
@@ -107,7 +104,6 @@ fn test_best_ask_with_mixed_entries() -> () {
             price,
             quantity: 25,
             side,
-            timestamp: id as u64 * 20
         });
     }
 
@@ -125,7 +121,6 @@ fn test_store_buy_order_as_bid() -> () {
         price: 10000,
         quantity: 25,
         side: Side::Buy,
-        timestamp: 100,
     });
 
     assert_eq!(orderbook.best_bid(), Some(&10000));
@@ -141,7 +136,6 @@ fn test_store_sell_order_as_ask() -> () {
         price: 10000,
         quantity: 25,
         side: Side::Sell,
-        timestamp: 100,
     });
 
     assert_eq!(orderbook.best_ask(), Some(&10000));

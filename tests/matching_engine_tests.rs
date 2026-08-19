@@ -13,7 +13,6 @@ fn test_buy_order_matches_standing_sell_order() -> () {
         price: 10000,
         quantity: 25,
         side: Side::Sell,
-        timestamp: 100,
     });
 
     let trades = matching_engine.submit_order(Order {
@@ -21,7 +20,6 @@ fn test_buy_order_matches_standing_sell_order() -> () {
         price: 10002,
         quantity: 10,
         side: Side::Buy,
-        timestamp: 110,
     });
 
     let expected_trades = vec![
@@ -37,7 +35,6 @@ fn test_buy_order_matches_standing_sell_order() -> () {
         price: 10000,
         quantity: 15,
         side: Side::Sell,
-        timestamp: 100,
     });
 
     // Test if the resulting order book is what we expect.
@@ -53,7 +50,6 @@ fn test_sell_order_matches_standing_buy_order() -> () {
         price: 9999,
         quantity: 25,
         side: Side::Sell,
-        timestamp: 100,
     });
 
     let trades = matching_engine.submit_order(Order {
@@ -61,7 +57,6 @@ fn test_sell_order_matches_standing_buy_order() -> () {
         price: 10001,
         quantity: 10,
         side: Side::Buy,
-        timestamp: 110,
     });
 
     let expected_trades = vec![
@@ -77,7 +72,6 @@ fn test_sell_order_matches_standing_buy_order() -> () {
         price: 9999,
         quantity: 15,
         side: Side::Sell,
-        timestamp: 100,
     });
 
     // Test if the resulting order book is what we expect.
@@ -96,7 +90,6 @@ fn cancel_single_standing_buy_order() -> () {
         price: 10000,
         quantity: 25,
         side: Side::Buy,
-        timestamp: 100,
     });
 
     let cancel_result = matching_engine.cancel_order(0);
@@ -120,7 +113,6 @@ fn cancel_single_standing_sell_order() -> () {
         price: 10000,
         quantity: 25,
         side: Side::Sell,
-        timestamp: 100,
     });
 
     let cancel_result = matching_engine.cancel_order(0);
@@ -139,9 +131,9 @@ fn cancel_target_order_from_multiple_orders() -> () {
     let mut matching_engine = MatchingEngine::new();
 
     let orders = [
-        Order { id: 0, price: 10002, quantity: 15, side: Side::Buy, timestamp: 100 },
-        Order { id: 1, price: 10000, quantity: 25, side: Side::Buy, timestamp: 110 },
-        Order { id: 2, price: 10000, quantity: 40, side: Side::Buy, timestamp: 120 },
+        Order { id: 0, price: 10002, quantity: 15, side: Side::Buy },
+        Order { id: 1, price: 10000, quantity: 25, side: Side::Buy },
+        Order { id: 2, price: 10000, quantity: 40, side: Side::Buy },
     ];
 
     for order in orders {
@@ -171,7 +163,6 @@ fn cancel_nonexisting_order() -> () {
         price: 10000,
         quantity: 25,
         side: Side::Sell,
-        timestamp: 100,
     };
 
     // Assumes submit_order works as intended.

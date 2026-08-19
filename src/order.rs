@@ -12,7 +12,6 @@ pub struct Order {
     pub price: i64,     // Price in ticks (e.g. 10050 = $100.50)
     pub quantity: u64,
     pub side: Side,
-    pub timestamp: u64,
 }
 
 impl Order {
