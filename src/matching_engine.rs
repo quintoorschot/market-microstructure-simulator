@@ -59,7 +59,11 @@ impl MatchingEngine {
     /// Cancel standing order using the order's id.
     pub fn cancel_order(&mut self, id: u64) -> bool {
         self.orderbook.cancel_order(id)
-    } 
+    }
+
+    pub fn modify_order(&mut self, id: u64, new_quantity: i64, new_price: u64) -> bool {
+        self.orderbook.modify_order(id, new_quantity, new_price)
+    }
 
     /// Display the matching engine's standing orders by printing the order book.
     pub fn display_order_book(&self) -> () {

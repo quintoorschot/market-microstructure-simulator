@@ -180,6 +180,11 @@ impl OrderBook {
 
         true
     }
+
+
+    pub fn modify_order(&mut self, id: u64, new_quantity: i64, new_price: u64) -> bool {
+        todo!()
+    }
 }
 
 
