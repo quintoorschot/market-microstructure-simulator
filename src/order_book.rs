@@ -193,25 +193,26 @@ impl OrderBook {
 
     pub fn cancel_order(&mut self, id: u64) -> bool {
 
-        if let Some(location) = Self::find_order(&self, id) {
-            println!("{:?}", location);
-            if location.side == Side::Buy {
-                self.bids.get_mut(&location.price).unwrap().remove(location.index);
-                if self.bids.get(&location.price).unwrap().is_empty() {
-                    self.bids.remove(&location.price);
-                }
-            }
+        let Some(location) = self.find_order(id) else {
+            return false;
+        };
 
-            if location.side == Side::Sell {
-                self.asks.get_mut(&location.price).unwrap().remove(location.index);
-                if self.asks.get(&location.price).unwrap().is_empty() {
-                    self.asks.remove(&location.price);
-                }
-            }
-            true
-        } else {
-            false
+        let book = match location.side {
+            Side::Buy => &mut self.bids,
+            Side::Sell => &mut self.asks,
+        };
+
+        let should_remove_price = {
+            let orders = book.get_mut(&location.price).unwrap();
+            orders.remove(location.index);
+            orders.is_empty()
+        };
+
+        if should_remove_price {
+            book.remove(&location.price);
         }
+
+        true
     }
 
     pub fn modify_order(&mut self, id: u64, new_quantity: i64, new_price: u64) -> bool {
