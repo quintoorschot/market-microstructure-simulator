@@ -60,38 +60,8 @@ impl MatchingEngine {
 
     /// Cancel standing order using the order's id.
     pub fn cancel_order(&mut self, id: u64) -> bool {
-
-        /// Auxiliary function of `cancel_order` to cancel order on a specific side of the order book.
-        fn cancel_on_side(side: &mut BTreeMap<i64, Vec<Order>>, id: u64) -> bool {
-
-            let (order_cancelled, empty_price) = 'search: {
-                for (price, price_level) in side.iter_mut() {
-                    if let Some(index) = price_level.iter().position(|order| order.id == id) {
-                        price_level.remove(index);
-
-                        if price_level.is_empty() {
-                            break 'search (true, Some(*price));
-                        }
-                        break 'search (true, None)
-                    }
-                }
-
-                break 'search (false, None)
-            };
-
-            if let Some(price) = empty_price {
-                side.remove(&price);
-            }
-
-            order_cancelled
-        }
-
-        if cancel_on_side(&mut self.orderbook.bids, id) {
-            return true;
-        }
-        cancel_on_side(&mut self.orderbook.asks, id)
-    }
-
+        self.orderbook.cancel_order(id)
+    } 
 
     /// Display the matching engine's standing orders by printing the order book.
     pub fn display_order_book(&self) -> () {

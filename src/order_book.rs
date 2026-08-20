@@ -152,6 +152,34 @@ impl OrderBook {
         trade
     }
 
+
+    pub fn cancel_order(&mut self, id: u64) -> bool {
+        Self::cancel_on_side(&mut self.bids, id) || Self::cancel_on_side(&mut self.asks, id)
+    }
+
+    fn cancel_on_side(
+        side: &mut BTreeMap<i64, Vec<Order>>,
+        id: u64
+    ) -> bool {
+
+        let Some((&price, index)) = side.iter().find_map(|(price, orders)| {
+            orders
+                .iter()
+                .position(|order| order.id == id)
+                .map(|index| (price, index))
+        }) else {
+            return false;
+        };
+
+        let level = side.get_mut(&price).unwrap();
+        level.remove(index);
+
+        if level.is_empty() {
+            side.remove(&price);
+        }
+
+        true
+    }
 }
 
 
