@@ -15,7 +15,7 @@ fn main() {
         id: 1,
         price: 10002,
         quantity: 10,
-        side: Side::Buy,
+        side: Side::Sell,
     };
 
     let order_2 = Order {

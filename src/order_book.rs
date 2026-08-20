@@ -1,7 +1,13 @@
 use core::fmt;
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, ops::Index};
 use crate::{order::{Order, Side}, trade::Trade};
 
+#[derive(Debug)]
+struct OrderLocation {
+    side: Side,
+    price: i64,
+    index: usize,
+}
 
 /// Stores resting orders that provide liquidity for the matching engine.
 ///
@@ -153,34 +159,60 @@ impl OrderBook {
     }
 
 
-    pub fn cancel_order(&mut self, id: u64) -> bool {
-        Self::cancel_on_side(&mut self.bids, id) || Self::cancel_on_side(&mut self.asks, id)
-    }
+    fn find_order(&self, id: u64) -> Option<OrderLocation> {
 
-    fn cancel_on_side(
-        side: &mut BTreeMap<i64, Vec<Order>>,
-        id: u64
-    ) -> bool {
-
-        let Some((&price, index)) = side.iter().find_map(|(price, orders)| {
+        if let Some((&price, index)) = self.bids.iter().find_map(|(price, orders)| {
             orders
                 .iter()
                 .position(|order| order.id == id)
                 .map(|index| (price, index))
-        }) else {
-            return false;
-        };
-
-        let level = side.get_mut(&price).unwrap();
-        level.remove(index);
-
-        if level.is_empty() {
-            side.remove(&price);
+        }) {
+            return Some(OrderLocation {
+                side: Side::Buy,
+                price,
+                index
+            })
         }
 
-        true
+        if let Some((&price, index)) = self.asks.iter().find_map(|(price, orders)| {
+            orders
+                .iter()
+                .position(|order| order.id == id)
+                .map(|index| (price, index))
+        }) {
+            return Some(OrderLocation {
+                side: Side::Sell,
+                price,
+                index
+            })
+        }
+
+        None
     }
 
+
+    pub fn cancel_order(&mut self, id: u64) -> bool {
+
+        if let Some(location) = Self::find_order(&self, id) {
+            println!("{:?}", location);
+            if location.side == Side::Buy {
+                self.bids.get_mut(&location.price).unwrap().remove(location.index);
+                if self.bids.get(&location.price).unwrap().is_empty() {
+                    self.bids.remove(&location.price);
+                }
+            }
+
+            if location.side == Side::Sell {
+                self.asks.get_mut(&location.price).unwrap().remove(location.index);
+                if self.asks.get(&location.price).unwrap().is_empty() {
+                    self.asks.remove(&location.price);
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
 
     pub fn modify_order(&mut self, id: u64, new_quantity: i64, new_price: u64) -> bool {
         todo!()
