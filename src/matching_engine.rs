@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use crate::{order_book::OrderBook, trade::Trade};
 use crate::order::{Order, Side};
 
