@@ -81,7 +81,7 @@ fn test_sell_order_matches_standing_buy_order() -> () {
 
 // ==================== ORDER CANCEL TESTS  ====================
 #[test]
-fn cancel_single_standing_buy_order() -> () {
+fn test_cancel_single_standing_buy_order() -> () {
     let mut matching_engine = MatchingEngine::new();
 
     // Assumes submit_order works as intended.
@@ -104,7 +104,7 @@ fn cancel_single_standing_buy_order() -> () {
 }
 
 #[test]
-fn cancel_single_standing_sell_order() -> () {
+fn test_cancel_single_standing_sell_order() -> () {
     let mut matching_engine = MatchingEngine::new();
 
     // Assumes submit_order works as intended.
@@ -127,7 +127,7 @@ fn cancel_single_standing_sell_order() -> () {
 }
 
 #[test]
-fn cancel_target_order_from_multiple_orders() -> () {
+fn test_cancel_target_order_from_multiple_orders() -> () {
     let mut matching_engine = MatchingEngine::new();
 
     let orders = [
@@ -136,6 +136,7 @@ fn cancel_target_order_from_multiple_orders() -> () {
         Order { id: 2, price: 10000, quantity: 40, side: Side::Buy },
     ];
 
+    // Submit each order to matching engine.
     for order in orders {
         // Assumes submit_order works as intended.
         matching_engine.submit_order(order);
@@ -155,7 +156,7 @@ fn cancel_target_order_from_multiple_orders() -> () {
 }
 
 #[test]
-fn cancel_nonexisting_order() -> () {
+fn test_cancel_nonexisting_order() -> () {
     let mut matching_engine = MatchingEngine::new();
 
     let order = Order {
@@ -178,4 +179,51 @@ fn cancel_nonexisting_order() -> () {
 
     // Existing non-matching orders should not be removed.
     assert_eq!(matching_engine.orderbook, expected_orderbook);
+}
+
+
+// ==================== ORDER MODIFY TESTS  ====================
+#[test]
+fn test_modify_order_to_same_price_lower_quantity() -> () {
+    // Same price, lower quantity -> keep queue position
+    let mut matching_engine = MatchingEngine::new();
+
+    // Here, order 0 will keep the same price (10000), but get a lower quantity (15 -> 5).
+    let modify_order_to = (0, 10000, 5 as u64);
+
+    let orders = [
+        Order { id: 0, price: 10000, quantity: 15, side: Side::Buy },
+        Order { id: 1, price: 10000, quantity: 25, side: Side::Buy },
+    ];
+
+    // Submit each order to matching engine.
+    for order in orders {
+        // Assumes submit_order works as intended.
+        matching_engine.submit_order(order);
+    }
+
+    // Test if initial priority queue is correct (price-time priority).
+    {
+        let mut expected_orderbook_before = OrderBook::new();
+        expected_orderbook_before.store_order(*orders.get(0).unwrap());
+        expected_orderbook_before.store_order(*orders.get(1).unwrap());
+
+        assert_eq!(matching_engine.orderbook, expected_orderbook_before);
+    }
+
+    // Test if after the order modification, the values changed and queue position is preserved.
+    {
+        // Modify the order.
+        matching_engine.modify_order(modify_order_to.0, modify_order_to.1, modify_order_to.2);
+
+        // Modified order should have the lower quantity, same price, and same queue position.
+        let mut expected_orderbook_after = OrderBook::new();
+
+        // Order 0 should remain first in the priority queue and have the updates values.
+        expected_orderbook_after.store_order(Order { id: modify_order_to.0, price: modify_order_to.1, quantity: modify_order_to.2, side: Side::Buy });
+        // Order 1 shouldn't change
+        expected_orderbook_after.store_order(*orders.get(1).unwrap());
+
+        assert_eq!(matching_engine.orderbook, expected_orderbook_after);
+    }
 }

@@ -61,7 +61,7 @@ impl MatchingEngine {
         self.orderbook.cancel_order(id)
     }
 
-    pub fn modify_order(&mut self, id: u64, new_quantity: i64, new_price: u64) -> bool {
+    pub fn modify_order(&mut self, id: u64, new_price: i64, new_quantity: u64) -> bool {
         self.orderbook.modify_order(id, new_quantity, new_price)
     }
 

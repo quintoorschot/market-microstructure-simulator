@@ -215,8 +215,26 @@ impl OrderBook {
         true
     }
 
-    pub fn modify_order(&mut self, id: u64, new_quantity: i64, new_price: u64) -> bool {
-        todo!()
+    pub fn modify_order(&mut self, id: u64, new_quantity: u64, new_price: i64) -> bool {
+        
+        let location = self.find_order(id).unwrap();
+        println!("{:?}", location);
+
+        let book = match location.side {
+            Side::Buy => &mut self.bids,
+            Side::Sell => &mut self.asks,
+        };
+
+        let orders = book.get_mut(&location.price).unwrap();
+        let order = orders.get_mut(location.index).unwrap();
+
+        // Modify order in place, no need to push it to the back of the queue
+        if new_price == order.price && new_quantity <= order.quantity {
+            order.price = new_price;
+            order.quantity = new_quantity;
+        }
+
+        true
     }
 }
 
