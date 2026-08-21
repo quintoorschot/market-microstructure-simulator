@@ -5,7 +5,7 @@ use market_microstructure_simulator::trade::Trade;
 
 // ==================== TRADE PROCESSING TESTS  ====================
 #[test]
-fn test_buy_order_matches_standing_sell_order() -> () {
+fn test_buy_order_matches_standing_sell_order() {
     let mut matching_engine = MatchingEngine::new();
 
     matching_engine.submit_order(Order {
@@ -42,7 +42,7 @@ fn test_buy_order_matches_standing_sell_order() -> () {
 }
 
 #[test]
-fn test_sell_order_matches_standing_buy_order() -> () {
+fn test_sell_order_matches_standing_buy_order() {
     let mut matching_engine = MatchingEngine::new();
     
     matching_engine.submit_order(Order {
@@ -81,7 +81,7 @@ fn test_sell_order_matches_standing_buy_order() -> () {
 
 // ==================== ORDER CANCEL TESTS  ====================
 #[test]
-fn test_cancel_single_standing_buy_order() -> () {
+fn test_cancel_single_standing_buy_order() {
     let mut matching_engine = MatchingEngine::new();
 
     // Assumes submit_order works as intended.
@@ -95,7 +95,7 @@ fn test_cancel_single_standing_buy_order() -> () {
     let cancel_result = matching_engine.cancel_order(0);
 
     // Check if cancellation was succesful.
-    assert_eq!(cancel_result, true);
+    assert!(cancel_result);
 
     let expected_orderbook = OrderBook::new();
 
@@ -104,7 +104,7 @@ fn test_cancel_single_standing_buy_order() -> () {
 }
 
 #[test]
-fn test_cancel_single_standing_sell_order() -> () {
+fn test_cancel_single_standing_sell_order() {
     let mut matching_engine = MatchingEngine::new();
 
     // Assumes submit_order works as intended.
@@ -118,7 +118,7 @@ fn test_cancel_single_standing_sell_order() -> () {
     let cancel_result = matching_engine.cancel_order(0);
 
     // Check if cancellation was succesful.
-    assert_eq!(cancel_result, true);
+    assert!(cancel_result);
 
     let expected_orderbook = OrderBook::new();
 
@@ -127,7 +127,7 @@ fn test_cancel_single_standing_sell_order() -> () {
 }
 
 #[test]
-fn test_cancel_target_order_from_multiple_orders() -> () {
+fn test_cancel_target_order_from_multiple_orders() {
     let mut matching_engine = MatchingEngine::new();
 
     let orders = [
@@ -146,7 +146,7 @@ fn test_cancel_target_order_from_multiple_orders() -> () {
     let cancel_result = matching_engine.cancel_order(1);
 
     // Check if cancellation was succesful.
-    assert_eq!(cancel_result, true);
+    assert!(cancel_result);
 
     let mut expected_orderbook = OrderBook::new();
     expected_orderbook.store_order(*orders.get(0).unwrap());
@@ -157,7 +157,7 @@ fn test_cancel_target_order_from_multiple_orders() -> () {
 }
 
 #[test]
-fn test_cancel_nonexisting_order() -> () {
+fn test_cancel_nonexisting_order() {
     let mut matching_engine = MatchingEngine::new();
 
     let order = Order {
@@ -173,7 +173,7 @@ fn test_cancel_nonexisting_order() -> () {
     let cancel_result = matching_engine.cancel_order(1);
 
     // Check if cancellation was succesful.
-    assert_eq!(cancel_result, false);
+    assert!(cancel_result);
 
     let mut expected_orderbook = OrderBook::new();
     expected_orderbook.store_order(order);
@@ -185,7 +185,7 @@ fn test_cancel_nonexisting_order() -> () {
 
 // ==================== ORDER MODIFY TESTS  ====================
 #[test]
-fn test_modify_order_to_same_price_lower_quantity() -> () {
+fn test_modify_order_to_same_price_lower_quantity() {
     // Same price, lower quantity -> keep queue position
     let mut matching_engine = MatchingEngine::new();
 

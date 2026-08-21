@@ -4,13 +4,13 @@ use market_microstructure_simulator::order::*;
 
 // ==================== BEST BID TESTS  ====================
 #[test]
-fn test_best_bid_empty() -> () {
+fn test_best_bid_empty() {
     let orderbook = OrderBook::new();
     assert_eq!(orderbook.best_bid(), None);
 }
 
 #[test]
-fn test_best_bid_with_buy_entries_only() -> () {
+fn test_best_bid_with_buy_entries_only() {
     let mut orderbook = OrderBook::new();
 
     let prices = [
@@ -32,7 +32,7 @@ fn test_best_bid_with_buy_entries_only() -> () {
 }
 
 #[test]
-fn test_best_bid_with_mixed_entries() -> () {
+fn test_best_bid_with_mixed_entries() {
     let mut orderbook = OrderBook::new();
 
     // (price, side)
@@ -58,7 +58,7 @@ fn test_best_bid_with_mixed_entries() -> () {
 
 // ==================== BEST ASK TESTS  ====================
 #[test]
-fn test_best_ask_empty() -> () {
+fn test_best_ask_empty() {
     let notebook = OrderBook::new();
     assert_eq!(notebook.best_ask(), None);
 }
@@ -87,7 +87,7 @@ fn test_best_ask_with_sell_entries_only() -> () {
 }
 
 #[test]
-fn test_best_ask_with_mixed_entries() -> () {
+fn test_best_ask_with_mixed_entries() {
     let mut orderbook = OrderBook::new();
 
     // (price, side)
@@ -113,7 +113,7 @@ fn test_best_ask_with_mixed_entries() -> () {
 
 // ==================== STORE ORDER TESTS  ====================
 #[test]
-fn test_store_buy_order_as_bid() -> () {
+fn test_store_buy_order_as_bid() {
     let mut orderbook = OrderBook::new();
 
     orderbook.store_order(Order {
@@ -128,7 +128,7 @@ fn test_store_buy_order_as_bid() -> () {
 }
 
 #[test]
-fn test_store_sell_order_as_ask() -> () {
+fn test_store_sell_order_as_ask() {
     let mut orderbook = OrderBook::new();
 
     orderbook.store_order(Order {
