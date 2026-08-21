@@ -1,14 +1,13 @@
+mod matching_engine;
 mod order;
 mod order_book;
-mod matching_engine;
 mod trade;
 
+use matching_engine::*;
 use order::*;
 use order_book::*;
-use matching_engine::*;
 
 fn main() {
-
     let mut matching_engine = MatchingEngine::new();
 
     let order_1 = Order {
@@ -24,7 +23,6 @@ fn main() {
         quantity: 15,
         side: Side::Sell,
     };
-
 
     matching_engine.submit_order(order_1);
     println!("Order 1 submitted!");

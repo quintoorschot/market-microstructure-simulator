@@ -1,6 +1,9 @@
+use crate::{
+    order::{Order, Side},
+    trade::Trade,
+};
 use core::fmt;
 use std::{collections::BTreeMap, ops::Index};
-use crate::{order::{Order, Side}, trade::Trade};
 
 #[derive(Debug)]
 struct OrderLocation {
@@ -15,14 +18,12 @@ struct OrderLocation {
 /// It is responsible for storing and retrieving resting liquidity.
 #[derive(PartialEq, Debug)]
 pub struct OrderBook {
-
     // Price => Orders at that price
     pub bids: BTreeMap<i64, Vec<Order>>,
     pub asks: BTreeMap<i64, Vec<Order>>,
 }
 
 impl OrderBook {
-
     pub fn new() -> Self {
         Self {
             bids: BTreeMap::new(),
@@ -30,10 +31,8 @@ impl OrderBook {
         }
     }
 
-
     /// Store a resting order in the order book.
     pub fn store_order(&mut self, order: Order) {
-
         match &order.side {
             Side::Buy => {
                 self.bids
@@ -158,9 +157,7 @@ impl OrderBook {
         trade
     }
 
-
     fn find_order(&self, id: u64) -> Option<OrderLocation> {
-
         if let Some((&price, index)) = self.bids.iter().find_map(|(price, orders)| {
             orders
                 .iter()
@@ -170,8 +167,8 @@ impl OrderBook {
             return Some(OrderLocation {
                 side: Side::Buy,
                 price,
-                index
-            })
+                index,
+            });
         }
 
         if let Some((&price, index)) = self.asks.iter().find_map(|(price, orders)| {
@@ -183,16 +180,14 @@ impl OrderBook {
             return Some(OrderLocation {
                 side: Side::Sell,
                 price,
-                index
-            })
+                index,
+            });
         }
 
         None
     }
 
-
     pub fn cancel_order(&mut self, id: u64) -> bool {
-
         let Some(location) = self.find_order(id) else {
             return false;
         };
@@ -216,7 +211,6 @@ impl OrderBook {
     }
 
     pub fn modify_order(&mut self, id: u64, new_quantity: u64, new_price: i64) -> bool {
-        
         let location = self.find_order(id).unwrap();
         println!("{:?}", location);
 
@@ -238,18 +232,13 @@ impl OrderBook {
     }
 }
 
-
 fn write_side(
     f: &mut fmt::Formatter<'_>,
     side: &str,
     levels: &BTreeMap<i64, Vec<Order>>,
 ) -> fmt::Result {
-
     for (price, orders) in levels {
-        let total_quantity: u64 = orders
-            .iter()
-            .map(|o| o.quantity)
-            .sum();
+        let total_quantity: u64 = orders.iter().map(|o| o.quantity).sum();
 
         writeln!(
             f,
@@ -264,14 +253,8 @@ fn write_side(
     Ok(())
 }
 
-
 impl fmt::Display for OrderBook {
-    
-    fn fmt(
-        &self,
-        f: &mut fmt::Formatter<'_>
-    ) -> fmt::Result {
-
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "============== BIDS ==============")?;
         write_side(f, "BUY", &self.bids)?;
 
@@ -280,5 +263,4 @@ impl fmt::Display for OrderBook {
 
         Ok(())
     }
-
 }

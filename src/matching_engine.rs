@@ -1,12 +1,11 @@
-use crate::{order_book::OrderBook, trade::Trade};
 use crate::order::{Order, Side};
+use crate::{order_book::OrderBook, trade::Trade};
 
 pub struct MatchingEngine {
     pub orderbook: OrderBook,
 }
 
 impl MatchingEngine {
-
     pub fn new() -> Self {
         Self {
             orderbook: OrderBook::new(),
@@ -14,18 +13,16 @@ impl MatchingEngine {
     }
 
     pub fn submit_order(&mut self, mut order: Order) -> Vec<Trade> {
-
         let mut trades: Vec<Trade> = Vec::new();
 
         loop {
-
             // Nothing left to execute.
             if order.quantity <= 0 {
                 break;
             };
 
             let opposite_price = match order.side {
-                Side::Buy  => self.orderbook.best_ask(),
+                Side::Buy => self.orderbook.best_ask(),
                 Side::Sell => self.orderbook.best_bid(),
             };
 
@@ -34,7 +31,7 @@ impl MatchingEngine {
             };
 
             let crosses = match order.side {
-                Side::Buy  => order.price >= best_price,
+                Side::Buy => order.price >= best_price,
                 Side::Sell => order.price <= best_price,
             };
 
@@ -55,7 +52,6 @@ impl MatchingEngine {
         trades
     }
 
-
     /// Cancel standing order using the order's id.
     pub fn cancel_order(&mut self, id: u64) -> bool {
         self.orderbook.cancel_order(id)
@@ -69,5 +65,4 @@ impl MatchingEngine {
     pub fn display_order_book(&self) -> () {
         println!("{}", self.orderbook)
     }
-
 }

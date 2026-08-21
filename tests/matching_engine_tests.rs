@@ -1,6 +1,6 @@
 use market_microstructure_simulator::matching_engine::MatchingEngine;
-use market_microstructure_simulator::order_book::OrderBook;
 use market_microstructure_simulator::order::*;
+use market_microstructure_simulator::order_book::OrderBook;
 use market_microstructure_simulator::trade::Trade;
 
 // ==================== TRADE PROCESSING TESTS  ====================
@@ -22,9 +22,12 @@ fn test_buy_order_matches_standing_sell_order() {
         side: Side::Buy,
     });
 
-    let expected_trades = vec![
-        Trade { incoming_order_id: 1, resting_order_id: 0, price: 10000, quantity: 10 },
-    ];
+    let expected_trades = vec![Trade {
+        incoming_order_id: 1,
+        resting_order_id: 0,
+        price: 10000,
+        quantity: 10,
+    }];
 
     // Test if the trades is processed as expected.
     assert_eq!(trades, expected_trades);
@@ -44,7 +47,7 @@ fn test_buy_order_matches_standing_sell_order() {
 #[test]
 fn test_sell_order_matches_standing_buy_order() {
     let mut matching_engine = MatchingEngine::new();
-    
+
     matching_engine.submit_order(Order {
         id: 0,
         price: 9999,
@@ -59,9 +62,12 @@ fn test_sell_order_matches_standing_buy_order() {
         side: Side::Buy,
     });
 
-    let expected_trades = vec![
-        Trade { incoming_order_id: 1, resting_order_id: 0, price: 9999, quantity: 10 },
-    ];
+    let expected_trades = vec![Trade {
+        incoming_order_id: 1,
+        resting_order_id: 0,
+        price: 9999,
+        quantity: 10,
+    }];
 
     // Test if the trades is processed as expected.
     assert_eq!(trades, expected_trades);
@@ -77,7 +83,6 @@ fn test_sell_order_matches_standing_buy_order() {
     // Test if the resulting order book is what we expect.
     assert_eq!(matching_engine.orderbook, expected_orderbook);
 }
-
 
 // ==================== ORDER CANCEL TESTS  ====================
 #[test]
@@ -131,17 +136,30 @@ fn test_cancel_target_order_from_multiple_orders() {
     let mut matching_engine = MatchingEngine::new();
 
     let orders = [
-        Order { id: 0, price: 10002, quantity: 15, side: Side::Buy },
-        Order { id: 1, price: 10000, quantity: 25, side: Side::Buy },
-        Order { id: 2, price: 10000, quantity: 40, side: Side::Buy },
+        Order {
+            id: 0,
+            price: 10002,
+            quantity: 15,
+            side: Side::Buy,
+        },
+        Order {
+            id: 1,
+            price: 10000,
+            quantity: 25,
+            side: Side::Buy,
+        },
+        Order {
+            id: 2,
+            price: 10000,
+            quantity: 40,
+            side: Side::Buy,
+        },
     ];
 
     // Submit each order to matching engine.
-    orders
-        .into_iter()
-        .for_each(|order| {
-            matching_engine.submit_order(order);
-        });
+    orders.into_iter().for_each(|order| {
+        matching_engine.submit_order(order);
+    });
 
     let cancel_result = matching_engine.cancel_order(1);
 
@@ -182,7 +200,6 @@ fn test_cancel_nonexisting_order() {
     assert_eq!(matching_engine.orderbook, expected_orderbook);
 }
 
-
 // ==================== ORDER MODIFY TESTS  ====================
 #[test]
 fn test_modify_order_to_same_price_lower_quantity() {
@@ -193,16 +210,24 @@ fn test_modify_order_to_same_price_lower_quantity() {
     let modify_order_to = (0, 10000, 5 as u64);
 
     let orders = [
-        Order { id: 0, price: 10000, quantity: 15, side: Side::Buy },
-        Order { id: 1, price: 10000, quantity: 25, side: Side::Buy },
+        Order {
+            id: 0,
+            price: 10000,
+            quantity: 15,
+            side: Side::Buy,
+        },
+        Order {
+            id: 1,
+            price: 10000,
+            quantity: 25,
+            side: Side::Buy,
+        },
     ];
 
     // Submit each order to matching engine.
-    orders
-        .into_iter()
-        .for_each(|order| {
-            matching_engine.submit_order(order);
-        });
+    orders.into_iter().for_each(|order| {
+        matching_engine.submit_order(order);
+    });
 
     // Test if initial priority queue is correct (price-time priority).
     {
@@ -222,7 +247,12 @@ fn test_modify_order_to_same_price_lower_quantity() {
         let mut expected_orderbook_after = OrderBook::new();
 
         // Order 0 should remain first in the priority queue and have the updates values.
-        expected_orderbook_after.store_order(Order { id: modify_order_to.0, price: modify_order_to.1, quantity: modify_order_to.2, side: Side::Buy });
+        expected_orderbook_after.store_order(Order {
+            id: modify_order_to.0,
+            price: modify_order_to.1,
+            quantity: modify_order_to.2,
+            side: Side::Buy,
+        });
         // Order 1 shouldn't change
         expected_orderbook_after.store_order(orders[1]);
 
