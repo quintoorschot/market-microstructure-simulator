@@ -137,10 +137,11 @@ fn test_cancel_target_order_from_multiple_orders() -> () {
     ];
 
     // Submit each order to matching engine.
-    for order in orders {
-        // Assumes submit_order works as intended.
-        matching_engine.submit_order(order);
-    }
+    orders
+        .into_iter()
+        .for_each(|order| {
+            matching_engine.submit_order(order);
+        });
 
     let cancel_result = matching_engine.cancel_order(1);
 
@@ -197,10 +198,11 @@ fn test_modify_order_to_same_price_lower_quantity() -> () {
     ];
 
     // Submit each order to matching engine.
-    for order in orders {
-        // Assumes submit_order works as intended.
-        matching_engine.submit_order(order);
-    }
+    orders
+        .into_iter()
+        .for_each(|order| {
+            matching_engine.submit_order(order);
+        });
 
     // Test if initial priority queue is correct (price-time priority).
     {
