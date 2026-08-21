@@ -3,7 +3,7 @@ use crate::{
     trade::Trade,
 };
 use core::fmt;
-use std::{collections::BTreeMap, ops::Index};
+use std::{collections::BTreeMap};
 
 #[derive(Debug)]
 struct OrderLocation {
@@ -16,7 +16,7 @@ struct OrderLocation {
 ///
 /// The order book maintains buy and sell orders grouped by price level.
 /// It is responsible for storing and retrieving resting liquidity.
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Default)]
 pub struct OrderBook {
     // Price => Orders at that price
     pub bids: BTreeMap<i64, Vec<Order>>,
@@ -37,14 +37,14 @@ impl OrderBook {
             Side::Buy => {
                 self.bids
                     .entry(order.price)
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push(order);
             }
 
             Side::Sell => {
                 self.asks
                     .entry(order.price)
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push(order);
             }
         }

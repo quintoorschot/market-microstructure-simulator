@@ -1,6 +1,7 @@
 use crate::order::{Order, Side};
 use crate::{order_book::OrderBook, trade::Trade};
 
+#[derive(Default)]
 pub struct MatchingEngine {
     pub orderbook: OrderBook,
 }
@@ -17,7 +18,7 @@ impl MatchingEngine {
 
         loop {
             // Nothing left to execute.
-            if order.quantity <= 0 {
+            if order.quantity == 0 {
                 break;
             };
 
@@ -62,7 +63,7 @@ impl MatchingEngine {
     }
 
     /// Display the matching engine's standing orders by printing the order book.
-    pub fn display_order_book(&self) -> () {
+    pub fn display_order_book(&self) {
         println!("{}", self.orderbook)
     }
 }

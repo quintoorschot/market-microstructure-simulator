@@ -5,7 +5,6 @@ mod trade;
 
 use matching_engine::*;
 use order::*;
-use order_book::*;
 
 fn main() {
     let mut matching_engine = MatchingEngine::new();

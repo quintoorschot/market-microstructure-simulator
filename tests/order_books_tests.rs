@@ -58,7 +58,7 @@ fn test_best_ask_empty() {
 }
 
 #[test]
-fn test_best_ask_with_sell_entries_only() -> () {
+fn test_best_ask_with_sell_entries_only() {
     let mut orderbook = OrderBook::new();
 
     // (id, price)
