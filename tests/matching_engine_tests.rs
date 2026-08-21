@@ -172,8 +172,8 @@ fn test_cancel_nonexisting_order() {
 
     let cancel_result = matching_engine.cancel_order(1);
 
-    // Check if cancellation was succesful.
-    assert!(cancel_result);
+    // Cancellation should return a fail.
+    assert!(!cancel_result);
 
     let mut expected_orderbook = OrderBook::new();
     expected_orderbook.store_order(order);
