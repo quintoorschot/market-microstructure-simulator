@@ -6,7 +6,7 @@ use market_microstructure_simulator::order::*;
 #[test]
 fn test_best_bid_empty() {
     let orderbook = OrderBook::new();
-    assert_eq!(orderbook.best_bid(), None);
+    assert!(orderbook.best_bid().is_none());
 }
 
 #[test]
@@ -60,7 +60,7 @@ fn test_best_bid_with_mixed_entries() {
 #[test]
 fn test_best_ask_empty() {
     let notebook = OrderBook::new();
-    assert_eq!(notebook.best_ask(), None);
+    assert!(notebook.best_ask().is_none());
 }
 
 #[test]
@@ -124,7 +124,7 @@ fn test_store_buy_order_as_bid() {
     });
 
     assert_eq!(orderbook.best_bid(), Some(&10000));
-    assert_eq!(orderbook.best_ask(), None);
+    assert!(orderbook.best_ask().is_none());
 }
 
 #[test]
@@ -139,5 +139,5 @@ fn test_store_sell_order_as_ask() {
     });
 
     assert_eq!(orderbook.best_ask(), Some(&10000));
-    assert_eq!(orderbook.best_bid(), None);
+    assert!(orderbook.best_bid().is_none());
 }

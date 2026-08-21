@@ -149,8 +149,8 @@ fn test_cancel_target_order_from_multiple_orders() {
     assert!(cancel_result);
 
     let mut expected_orderbook = OrderBook::new();
-    expected_orderbook.store_order(*orders.get(0).unwrap());
-    expected_orderbook.store_order(*orders.get(2).unwrap());
+    expected_orderbook.store_order(orders[0]);
+    expected_orderbook.store_order(orders[2]);
 
     // Check if order got cancelled and removed from orderbook.
     assert_eq!(matching_engine.orderbook, expected_orderbook);
@@ -207,8 +207,8 @@ fn test_modify_order_to_same_price_lower_quantity() {
     // Test if initial priority queue is correct (price-time priority).
     {
         let mut expected_orderbook_before = OrderBook::new();
-        expected_orderbook_before.store_order(*orders.get(0).unwrap());
-        expected_orderbook_before.store_order(*orders.get(1).unwrap());
+        expected_orderbook_before.store_order(orders[0]);
+        expected_orderbook_before.store_order(orders[1]);
 
         assert_eq!(matching_engine.orderbook, expected_orderbook_before);
     }
@@ -224,7 +224,7 @@ fn test_modify_order_to_same_price_lower_quantity() {
         // Order 0 should remain first in the priority queue and have the updates values.
         expected_orderbook_after.store_order(Order { id: modify_order_to.0, price: modify_order_to.1, quantity: modify_order_to.2, side: Side::Buy });
         // Order 1 shouldn't change
-        expected_orderbook_after.store_order(*orders.get(1).unwrap());
+        expected_orderbook_after.store_order(orders[1]);
 
         assert_eq!(matching_engine.orderbook, expected_orderbook_after);
     }
