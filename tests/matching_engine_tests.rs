@@ -172,7 +172,7 @@ fn test_cancel_nonexisting_order() {
 
     let cancel_result = matching_engine.cancel_order(1);
 
-    // Cancellation should return a fail.
+    // Non-existing order cancellation should return a fail.
     assert!(!cancel_result);
 
     let mut expected_orderbook = OrderBook::new();
