@@ -341,7 +341,7 @@ fn test_modify_order_to_same_price_higher_quantity() {
         assert_eq!(matching_engine.orderbook, expected_orderbook_before);
     }
 
-    // Test if after the order modification, the values changed and queue position is preserved.
+    // Test if after the order modification, the values changed and queue position is reverted.
     {
         // Modify the order.
         matching_engine.modify_order(modify_order_to.0, modify_order_to.1, modify_order_to.2);
@@ -349,8 +349,76 @@ fn test_modify_order_to_same_price_higher_quantity() {
         // Modified order should have the lower quantity, same price, and same queue position.
         let mut expected_orderbook_after = OrderBook::new();
 
-        // Order 0 should remain remain in the same price remain and move to the back of the priority queue
+        // Order 0 should remain remain in the same price level and move to the back of the priority queue.
         expected_orderbook_after.store_order(orders[1]);
+        expected_orderbook_after.store_order(Order {
+            id: modify_order_to.0,
+            price: modify_order_to.1,
+            quantity: modify_order_to.2,
+            side: Side::Buy,
+        });
+
+        assert_eq!(matching_engine.orderbook, expected_orderbook_after);
+    }
+}
+
+#[test]
+fn test_modify_order_to_higher_price_same_quantity() {
+    // Higher price, same quantity -> Move to different price level, and back to start of queue
+    let mut matching_engine = MatchingEngine::new();
+
+    // Here, order 0 will get a higher price (10000 -> 10005), but keep the same quantity (15).
+    let modify_order_to = (0, 10005, 15);
+
+    let orders = [
+        Order {
+            id: 0,
+            price: 10000,
+            quantity: 15,
+            side: Side::Buy,
+        },
+        Order {
+            id: 1,
+            price: 10000,
+            quantity: 10,
+            side: Side::Buy,
+        },
+        Order {
+            id: 2,
+            price: 10005,
+            quantity: 25,
+            side: Side::Buy,
+        },
+    ];
+
+    // Submit each order to matching engine.
+    orders
+        .into_iter()
+        .for_each(|order| {
+            matching_engine.submit_order(order);
+        });
+
+    // Test if initial priority queue is correctly ordered (price-time priority).
+    {
+        let mut expected_orderbook_before = OrderBook::new();
+        expected_orderbook_before.store_order(orders[0]);
+        expected_orderbook_before.store_order(orders[1]);
+        expected_orderbook_before.store_order(orders[2]);
+
+        assert_eq!(matching_engine.orderbook, expected_orderbook_before);
+    }
+
+        // Test if after the order modification, the values changed and queue position is preserved.
+    {
+        // Modify the order.
+        matching_engine.modify_order(modify_order_to.0, modify_order_to.1, modify_order_to.2);
+
+        // Modified order should have the lower quantity, same price, and same queue position.
+        let mut expected_orderbook_after = OrderBook::new();
+
+        // Order 0 should move to another price level and move to the back of the priority queue.
+        expected_orderbook_after.store_order(orders[1]);
+        expected_orderbook_after.store_order(orders[2]);
         expected_orderbook_after.store_order(Order {
             id: modify_order_to.0,
             price: modify_order_to.1,
