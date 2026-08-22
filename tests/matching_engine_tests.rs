@@ -202,6 +202,46 @@ fn test_cancel_nonexisting_order() {
 
 // ==================== ORDER MODIFY TESTS  ====================
 #[test]
+fn test_modify_order_to_same_price_same_quantity() {
+    // Same price, same quantity -> nothing changes (keep queue position)
+    let mut matching_engine = MatchingEngine::new();
+
+    let orders = [
+        Order {
+            id: 0,
+            price: 10000,
+            quantity: 15,
+            side: Side::Buy,
+        },
+        Order {
+            id: 1,
+            price: 10000,
+            quantity: 25,
+            side: Side::Buy,
+        },
+    ];
+
+    orders
+        .into_iter()
+        .for_each(
+            |order| { matching_engine.submit_order(order); }
+        );
+
+    let mut expected_orderbook = OrderBook::new();
+    expected_orderbook.store_order(orders[0]);
+    expected_orderbook.store_order(orders[1]);
+
+    // Test if initial priority queue is correctly ordered
+    assert_eq!(matching_engine.orderbook, expected_orderbook);
+
+    // Modify order 0 to keep the exact same values. Priority position and order values should be preserved.
+    matching_engine.modify_order(orders[0].id, orders[0].price, orders[0].quantity);
+
+    // Test if priority queue and orders remained unchanged.
+    assert_eq!(matching_engine.orderbook, expected_orderbook);
+}
+
+#[test]
 fn test_modify_order_to_same_price_lower_quantity() {
     // Same price, lower quantity -> keep queue position
     let mut matching_engine = MatchingEngine::new();
@@ -225,11 +265,13 @@ fn test_modify_order_to_same_price_lower_quantity() {
     ];
 
     // Submit each order to matching engine.
-    orders.into_iter().for_each(|order| {
-        matching_engine.submit_order(order);
-    });
+    orders
+        .into_iter()
+        .for_each(|order| {
+            matching_engine.submit_order(order);
+        });
 
-    // Test if initial priority queue is correct (price-time priority).
+    // Test if initial priority queue is correctly ordered (price-time priority).
     {
         let mut expected_orderbook_before = OrderBook::new();
         expected_orderbook_before.store_order(orders[0]);
