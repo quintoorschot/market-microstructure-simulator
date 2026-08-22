@@ -5,6 +5,7 @@ use crate::{
 use core::fmt;
 use std::{collections::BTreeMap};
 
+/// Represents the location of an order in the order book (side -> price level -> index within price level)
 #[derive(Debug)]
 struct OrderLocation {
     side: Side,
