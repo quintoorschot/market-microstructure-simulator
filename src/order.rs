@@ -12,7 +12,7 @@ pub enum Side {
 /// - `id` (u64): identifier for the order.
 /// - `price` (i64): price in ticks (e.g. 10050 = $100.50) at which the order is willing to execute.
 /// - `quantity` (u64): number of units the order is willing to buy or sell.
-///  - `side` (Side): indicates whether the order is a buy or sell.
+/// - `side` (Side): indicates whether the order is a buy or sell.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Order {
     /// Identifier for the order.
