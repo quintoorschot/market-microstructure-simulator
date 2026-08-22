@@ -221,12 +221,28 @@ impl OrderBook {
         };
 
         let orders = book.get_mut(&location.price).unwrap();
-        let order = orders.get_mut(location.index).unwrap();
 
-        // Modify order in place, no need to push it to the back of the queue
-        if new_price == order.price && new_quantity <= order.quantity {
+        let keep_priority = {
+            let order = &orders[location.index];
+            new_price == order.price && new_quantity <= order.quantity
+        };
+
+        if keep_priority {
+            let order = &mut orders[location.index];
+            order.quantity = new_quantity;
+        } else {
+            let mut order = orders.remove(location.index);
+
+            if orders.is_empty() {
+                book.remove(&location.price);
+            }
+
             order.price = new_price;
             order.quantity = new_quantity;
+
+            book.entry(new_price)
+                .or_default()
+                .push(order);
         }
 
         true
