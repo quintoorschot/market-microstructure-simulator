@@ -1,6 +1,7 @@
 use crate::{
     order::{Order, Side},
     trade::Trade,
+    exchange_events::ExchangeEvent,
 };
 use core::fmt;
 use std::{collections::BTreeMap};
@@ -188,9 +189,11 @@ impl OrderBook {
         None
     }
 
-    pub fn cancel_order(&mut self, id: u64) -> bool {
+    pub fn cancel_order(&mut self, id: u64) -> ExchangeEvent {
         let Some(location) = self.find_order(id) else {
-            return false;
+            return ExchangeEvent::CancelRejected {
+                order_id: id
+            };
         };
 
         let book = match location.side {
@@ -208,7 +211,9 @@ impl OrderBook {
             book.remove(&location.price);
         }
 
-        true
+        ExchangeEvent::OrderCancelled {
+            order_id: id
+        }
     }
 
     pub fn modify_order(&mut self, id: u64, new_quantity: u64, new_price: i64) -> bool {

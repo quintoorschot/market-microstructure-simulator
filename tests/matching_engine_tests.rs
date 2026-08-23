@@ -1,3 +1,4 @@
+use market_microstructure_simulator::exchange_events::ExchangeEvent;
 use market_microstructure_simulator::matching_engine::MatchingEngine;
 use market_microstructure_simulator::order::*;
 use market_microstructure_simulator::order_book::OrderBook;
@@ -100,7 +101,10 @@ fn test_cancel_single_standing_buy_order() {
     let cancel_result = matching_engine.cancel_order(0);
 
     // Check if cancellation was succesful.
-    assert!(cancel_result);
+    assert!(matches!(
+        cancel_result,
+        ExchangeEvent::OrderCancelled { order_id: 0 }
+    ));
 
     let expected_orderbook = OrderBook::new();
 
@@ -123,7 +127,10 @@ fn test_cancel_single_standing_sell_order() {
     let cancel_result = matching_engine.cancel_order(0);
 
     // Check if cancellation was succesful.
-    assert!(cancel_result);
+    assert!(matches!(
+        cancel_result,
+        ExchangeEvent::OrderCancelled {order_id: 0}
+    ));
 
     let expected_orderbook = OrderBook::new();
 
@@ -164,7 +171,10 @@ fn test_cancel_target_order_from_multiple_orders() {
     let cancel_result = matching_engine.cancel_order(1);
 
     // Check if cancellation was succesful.
-    assert!(cancel_result);
+    assert!(matches!(
+        cancel_result,
+        ExchangeEvent::OrderCancelled { order_id: 1 }
+    ));
 
     let mut expected_orderbook = OrderBook::new();
     expected_orderbook.store_order(orders[0]);
@@ -191,7 +201,10 @@ fn test_cancel_nonexisting_order() {
     let cancel_result = matching_engine.cancel_order(1);
 
     // Non-existing order cancellation should return a fail.
-    assert!(!cancel_result);
+    assert!(matches!(
+            cancel_result,
+            ExchangeEvent::CancelRejected { order_id: 1 }
+        ));
 
     let mut expected_orderbook = OrderBook::new();
     expected_orderbook.store_order(order);

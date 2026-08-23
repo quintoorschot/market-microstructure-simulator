@@ -2,7 +2,9 @@ mod matching_engine;
 mod order;
 mod order_book;
 mod trade;
+mod exchange_events;
 
+use exchange_events::*;
 use matching_engine::*;
 use order::*;
 

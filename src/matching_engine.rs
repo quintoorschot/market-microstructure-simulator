@@ -1,3 +1,4 @@
+use crate::exchange_events::ExchangeEvent;
 use crate::order::{Order, Side};
 use crate::{order_book::OrderBook, trade::Trade};
 
@@ -54,7 +55,7 @@ impl MatchingEngine {
     }
 
     /// Cancel standing order using the order's id.
-    pub fn cancel_order(&mut self, id: u64) -> bool {
+    pub fn cancel_order(&mut self, id: u64) -> ExchangeEvent {
         self.orderbook.cancel_order(id)
     }
 
