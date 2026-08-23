@@ -59,8 +59,8 @@ impl MatchingEngine {
         self.orderbook.cancel_order(id)
     }
 
-    pub fn modify_order(&mut self, id: u64, new_price: i64, new_quantity: u64) -> bool {
-        self.orderbook.modify_order(id, new_quantity, new_price)
+    pub fn modify_order(&mut self, id: u64, new_price: i64, new_quantity: i64) -> ExchangeEvent {
+        self.orderbook.modify_order(id, new_price, new_quantity)
     }
 
     /// Display the matching engine's standing orders by printing the order book.

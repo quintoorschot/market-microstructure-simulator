@@ -18,5 +18,5 @@ pub struct Trade {
     pub price: i64,
 
     /// Quantity executed between the two orders.
-    pub quantity: u64,
+    pub quantity: i64,
 }

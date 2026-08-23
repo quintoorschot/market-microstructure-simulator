@@ -452,5 +452,5 @@ fn test_modify_order_unknown_id() {
     // Try to modify order that doesn't exist -> Should return `false`.
     let result = matching_engine.modify_order(1, 10002, 20);
 
-    assert!(!result);
+    assert!(matches!(result, ExchangeEvent::ModificationFailed { order_id: 1 }));
 }

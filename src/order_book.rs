@@ -216,10 +216,12 @@ impl OrderBook {
         }
     }
 
-    pub fn modify_order(&mut self, id: u64, new_quantity: u64, new_price: i64) -> bool {
+    pub fn modify_order(&mut self, id: u64, new_price: i64, new_quantity: i64) -> ExchangeEvent {
 
         let Some(location) = self.find_order(id) else {
-            return false;
+            return ExchangeEvent::ModificationFailed {
+                order_id: id
+            };
         };
 
         let book = match location.side {
@@ -234,8 +236,12 @@ impl OrderBook {
             new_price == order.price && new_quantity <= order.quantity
         };
 
+        let mut old_price = 0;
+        let mut old_quantity = 0;
+
         if keep_priority {
             let order = &mut orders[location.index];
+            old_quantity = order.quantity;
             order.quantity = new_quantity;
         } else {
             let mut order = orders.remove(location.index);
@@ -244,6 +250,7 @@ impl OrderBook {
                 book.remove(&location.price);
             }
 
+            old_price = order.price;
             order.price = new_price;
             order.quantity = new_quantity;
 
@@ -252,7 +259,13 @@ impl OrderBook {
                 .push(order);
         }
 
-        true
+        ExchangeEvent::OrderModified {
+            order_id: id,
+            old_price: old_price,
+            new_price,
+            old_quantity: old_quantity,
+            new_quantity,
+        }
     }
 }
 
@@ -262,7 +275,7 @@ fn write_side(
     levels: &BTreeMap<i64, Vec<Order>>,
 ) -> fmt::Result {
     for (price, orders) in levels {
-        let total_quantity: u64 = orders.iter().map(|o| o.quantity).sum();
+        let total_quantity: i64 = orders.iter().map(|o| o.quantity).sum();
 
         writeln!(
             f,
