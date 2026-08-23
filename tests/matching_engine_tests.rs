@@ -203,7 +203,7 @@ fn test_cancel_nonexisting_order() {
     // Non-existing order cancellation should return a fail.
     assert!(matches!(
             cancel_result,
-            ExchangeEvent::CancelRejected { order_id: 1 }
+            ExchangeEvent::CancellationRejected { order_id: 1 }
         ));
 
     let mut expected_orderbook = OrderBook::new();
