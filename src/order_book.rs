@@ -191,7 +191,7 @@ impl OrderBook {
 
     pub fn cancel_order(&mut self, id: u64) -> ExchangeEvent {
         let Some(location) = self.find_order(id) else {
-            return ExchangeEvent::CancelRejected {
+            return ExchangeEvent::CancellationRejected {
                 order_id: id
             };
         };
