@@ -212,8 +212,10 @@ impl OrderBook {
     }
 
     pub fn modify_order(&mut self, id: u64, new_quantity: u64, new_price: i64) -> bool {
-        let location = self.find_order(id).unwrap();
-        println!("{:?}", location);
+
+        let Some(location) = self.find_order(id) else {
+            return false;
+        };
 
         let book = match location.side {
             Side::Buy => &mut self.bids,

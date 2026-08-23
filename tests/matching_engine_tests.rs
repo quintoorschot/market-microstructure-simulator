@@ -429,3 +429,15 @@ fn test_modify_order_to_higher_price_same_quantity() {
         assert_eq!(matching_engine.orderbook, expected_orderbook_after);
     }
 }
+
+#[test]
+fn test_modify_order_unknown_id() {
+    let mut matching_engine = MatchingEngine::new();
+
+    matching_engine.submit_order(Order { id: 0, price: 10000, quantity: 15, side: Side::Buy });
+    
+    // Try to modify order that doesn't exist -> Should return `false`.
+    let result = matching_engine.modify_order(1, 10002, 20);
+
+    assert!(!result);
+}

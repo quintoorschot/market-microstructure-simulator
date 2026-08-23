@@ -26,7 +26,7 @@ fn main() {
     matching_engine.submit_order(order_1);
     println!("Order 1 submitted!");
 
-    matching_engine.modify_order(1, 10005, 15);
+    matching_engine.modify_order(100, 10005, 15);
     // matching_engine.submit_order(order_2);
     // println!("Order 2 submitted!");
 
