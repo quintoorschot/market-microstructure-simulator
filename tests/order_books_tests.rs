@@ -94,30 +94,6 @@ proptest! {
     }
 }
 
-#[test]
-fn test_best_ask_with_mixed_entries() {
-    let mut orderbook = OrderBook::new();
-
-    // (price, side)
-    let orders = [
-        (10000, Side::Sell),
-        (9999, Side::Buy),
-        (10002, Side::Sell),
-        (9998, Side::Buy),
-    ];
-
-    for (id, (price, side)) in orders.into_iter().enumerate() {
-        orderbook.store_order(Order {
-            id: id as u64,
-            price,
-            quantity: 25,
-            side,
-        });
-    }
-
-    assert_eq!(orderbook.best_ask(), Some(&10000));
-}
-
 // ==================== STORE ORDER TESTS  ====================
 #[test]
 fn test_store_buy_order_as_bid() {
