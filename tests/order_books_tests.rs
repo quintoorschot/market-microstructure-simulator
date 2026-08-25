@@ -1,29 +1,35 @@
 use market_microstructure_simulator::order::*;
 use market_microstructure_simulator::order_book::OrderBook;
+use proptest::prelude::*;
 
 // ==================== BEST BID TESTS  ====================
 #[test]
-fn test_best_bid_empty() {
+fn test_best_order_book_empty() {
     let orderbook = OrderBook::new();
     assert!(orderbook.best_bid().is_none());
+    assert!(orderbook.best_ask().is_none());
 }
 
-#[test]
-fn test_best_bid_with_buy_entries_only() {
-    let mut orderbook = OrderBook::new();
+proptest! {
+    #[test]
+    fn test_best_bid_with_buy_entries_only(
+        prices in prop::collection::vec(1u64..1_000_000, 1..100)
+    ) {
+        let mut orderbook = OrderBook::new();
 
-    let prices = [10000, 10002, 9999];
+        for (id, &price) in prices.iter().enumerate() {
+            orderbook.store_order(Order { id: id as u64, price, quantity: 25, side: Side::Buy });
+        }
 
-    for (id, price) in prices.into_iter().enumerate() {
-        orderbook.store_order(Order {
-            id: id as u64,
-            price,
-            quantity: 25,
-            side: Side::Buy,
-        });
+        let expected_best_bid = prices.iter().copied().max();
+
+        prop_assert_eq!(
+            orderbook.best_bid().copied(),
+            expected_best_bid
+        );
+
+        prop_assert!(orderbook.best_ask().is_none());
     }
-
-    assert_eq!(orderbook.best_bid(), Some(&10002));
 }
 
 #[test]
