@@ -65,8 +65,8 @@ fn test_sell_order_matches_standing_buy_order() {
     });
 
     let expected_event = vec![ExchangeEvent::TradeExecuted {
-        incoming_order_id: 0,
-        resting_order_id: 1,
+        incoming_order_id: 1,
+        resting_order_id: 0,
         price: 9999,
         quantity: 10,
         incoming_remaining: 0,

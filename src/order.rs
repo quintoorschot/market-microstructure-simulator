@@ -19,7 +19,7 @@ pub struct Order {
     pub id: u64,
 
     /// Price in ticks (e.g. 10050 = $100.50) at which the order is willing to execute.
-    pub price: i64,
+    pub price: u64,
 
     /// Number of units the order is willing to buy or sell.
     pub quantity: i64,

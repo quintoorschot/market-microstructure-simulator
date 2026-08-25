@@ -5,7 +5,7 @@ pub enum ExchangeEvent {
     TradeExecuted {
         incoming_order_id: u64,
         resting_order_id: u64,
-        price: i64,
+        price: u64,
         quantity: i64,
 
         incoming_remaining: i64,
@@ -21,8 +21,8 @@ pub enum ExchangeEvent {
     /// Represents successful order modification.
     OrderModified {
         order_id: u64,
-        old_price: i64,
-        new_price: i64,
+        old_price: u64,
+        new_price: u64,
         old_quantity: i64,
         new_quantity: i64,
     },

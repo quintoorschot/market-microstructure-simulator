@@ -1,7 +1,6 @@
 use crate::{
     exchange_events::ExchangeEvent,
     order::{Order, Side},
-    trade::Trade,
 };
 use core::fmt;
 use std::collections::BTreeMap;
@@ -10,7 +9,7 @@ use std::collections::BTreeMap;
 #[derive(Debug)]
 struct OrderLocation {
     side: Side,
-    price: i64,
+    price: u64,
     index: usize,
 }
 
@@ -20,9 +19,9 @@ struct OrderLocation {
 /// It is responsible for storing and retrieving resting liquidity.
 #[derive(PartialEq, Debug, Default)]
 pub struct OrderBook {
-    // Price => Orders at that price
-    pub bids: BTreeMap<i64, Vec<Order>>,
-    pub asks: BTreeMap<i64, Vec<Order>>,
+    // Price -> Orders at that price
+    pub bids: BTreeMap<u64, Vec<Order>>,
+    pub asks: BTreeMap<u64, Vec<Order>>,
 }
 
 impl OrderBook {
@@ -47,12 +46,12 @@ impl OrderBook {
     }
 
     /// Returns the best (highest) bid price if it exists, otherwise returns None.
-    pub fn best_bid(&self) -> Option<&i64> {
+    pub fn best_bid(&self) -> Option<&u64> {
         self.bids.keys().next_back()
     }
 
     /// Returns the best (lowest) ask price if it exists, otherwise returns None.
-    pub fn best_ask(&self) -> Option<&i64> {
+    pub fn best_ask(&self) -> Option<&u64> {
         self.asks.keys().next()
     }
 
@@ -218,7 +217,7 @@ impl OrderBook {
         ExchangeEvent::OrderCancelled { order_id: id }
     }
 
-    pub fn modify_order(&mut self, id: u64, new_price: i64, new_quantity: i64) -> ExchangeEvent {
+    pub fn modify_order(&mut self, id: u64, new_price: u64, new_quantity: i64) -> ExchangeEvent {
         let Some(location) = self.find_order(id) else {
             return ExchangeEvent::ModificationFailed { order_id: id };
         };
@@ -269,7 +268,7 @@ impl OrderBook {
 fn write_side(
     f: &mut fmt::Formatter<'_>,
     side: &str,
-    levels: &BTreeMap<i64, Vec<Order>>,
+    levels: &BTreeMap<u64, Vec<Order>>,
 ) -> fmt::Result {
     for (price, orders) in levels {
         let total_quantity: i64 = orders.iter().map(|o| o.quantity).sum();
