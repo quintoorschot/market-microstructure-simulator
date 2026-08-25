@@ -95,32 +95,40 @@ proptest! {
 }
 
 // ==================== STORE ORDER TESTS  ====================
-#[test]
-fn test_store_buy_order_as_bid() {
-    let mut orderbook = OrderBook::new();
+proptest! {
+    #[test]
+    fn test_store_buy_order_as_bid(
+        price in 1u64..1_000_000,
+    ) {
+        let mut orderbook = OrderBook::new();
 
-    orderbook.store_order(Order {
-        id: 1,
-        price: 10000,
-        quantity: 25,
-        side: Side::Buy,
-    });
+        orderbook.store_order(Order {
+            id: 1,
+            price,
+            quantity: 25,
+            side: Side::Buy,
+        });
 
-    assert_eq!(orderbook.best_bid(), Some(&10000));
-    assert!(orderbook.best_ask().is_none());
+        assert_eq!(orderbook.best_bid(), Some(&price));
+        assert!(orderbook.best_ask().is_none());
+    }
 }
 
-#[test]
-fn test_store_sell_order_as_ask() {
-    let mut orderbook = OrderBook::new();
+proptest! {
+    #[test]
+    fn test_store_sell_order_as_ask(
+        price in 1u64..1_000_000,
+    ) {
+        let mut orderbook = OrderBook::new();
 
-    orderbook.store_order(Order {
-        id: 1,
-        price: 10000,
-        quantity: 25,
-        side: Side::Sell,
-    });
+        orderbook.store_order(Order {
+            id: 1,
+            price,
+            quantity: 25,
+            side: Side::Sell,
+        });
 
-    assert_eq!(orderbook.best_ask(), Some(&10000));
-    assert!(orderbook.best_bid().is_none());
+        assert_eq!(orderbook.best_ask(), Some(&price));
+        assert!(orderbook.best_bid().is_none());
+    }
 }
