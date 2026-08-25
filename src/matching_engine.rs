@@ -1,6 +1,6 @@
 use crate::exchange_events::ExchangeEvent;
 use crate::order::{Order, Side};
-use crate::{order_book::OrderBook};
+use crate::order_book::OrderBook;
 
 #[derive(Default)]
 pub struct MatchingEngine {
@@ -59,7 +59,12 @@ impl MatchingEngine {
         self.orderbook.cancel_order(id)
     }
 
-    pub fn modify_order(&mut self, id: u64, new_price: u64, new_quantity: i64) -> ExchangeEvent {
+    pub fn modify_order(
+        &mut self,
+        id: u64,
+        new_price: u64,
+        new_quantity: i64,
+    ) -> Vec<ExchangeEvent> {
         self.orderbook.modify_order(id, new_price, new_quantity)
     }
 

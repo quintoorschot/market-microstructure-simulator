@@ -217,51 +217,110 @@ impl OrderBook {
         ExchangeEvent::OrderCancelled { order_id: id }
     }
 
-    pub fn modify_order(&mut self, id: u64, new_price: u64, new_quantity: i64) -> ExchangeEvent {
+    pub fn modify_order(
+        &mut self,
+        id: u64,
+        new_price: u64,
+        new_quantity: i64,
+    ) -> Vec<ExchangeEvent> {
         let Some(location) = self.find_order(id) else {
-            return ExchangeEvent::ModificationFailed { order_id: id };
+            return vec![ExchangeEvent::ModificationFailed { order_id: id }];
         };
 
-        let book = match location.side {
-            Side::Buy => &mut self.bids,
-            Side::Sell => &mut self.asks,
-        };
+        let (old_price, old_quantity, keep_priority) = {
+            let book = match &location.side {
+                Side::Buy => &self.bids,
+                Side::Sell => &self.asks,
+            };
 
-        let orders = book.get_mut(&location.price).unwrap();
+            let orders = book.get(&location.price).expect("Price level must exist");
 
-        let keep_priority = {
             let order = &orders[location.index];
-            new_price == order.price && new_quantity <= order.quantity
-        };
 
-        let mut old_price = 0;
-        let mut old_quantity = 0;
+            (
+                order.price,
+                order.quantity,
+                new_price == order.price && new_quantity <= order.quantity,
+            )
+        };
 
         if keep_priority {
-            let order = &mut orders[location.index];
-            old_quantity = order.quantity;
-            order.quantity = new_quantity;
-        } else {
-            let mut order = orders.remove(location.index);
+            let book = match &location.side {
+                Side::Buy => &mut self.bids,
+                Side::Sell => &mut self.asks,
+            };
 
-            if orders.is_empty() {
+            let orders = book
+                .get_mut(&location.price)
+                .expect("Price level must exist");
+
+            orders[location.index].quantity = new_quantity;
+
+            return vec![ExchangeEvent::OrderModified {
+                order_id: id,
+                old_price,
+                new_price,
+                old_quantity,
+                new_quantity,
+            }];
+        }
+
+        let mut order = {
+            let book = match &location.side {
+                Side::Buy => &mut self.bids,
+                Side::Sell => &mut self.asks,
+            };
+
+            let orders = book
+                .get_mut(&location.price)
+                .expect("Price level must exist");
+
+            let order = orders.remove(location.index);
+            let remove_price_level = orders.is_empty();
+
+            if remove_price_level {
                 book.remove(&location.price);
             }
 
-            old_price = order.price;
-            order.price = new_price;
-            order.quantity = new_quantity;
+            order
+        };
 
-            book.entry(new_price).or_default().push(order);
-        }
+        order.price = new_price;
+        order.quantity = new_quantity;
 
-        ExchangeEvent::OrderModified {
+        let mut events = vec![ExchangeEvent::OrderModified {
             order_id: id,
-            old_price: old_price,
+            old_price,
             new_price,
-            old_quantity: old_quantity,
+            old_quantity,
             new_quantity,
+        }];
+
+        while order.quantity > 0 {
+            let crosses = match order.side {
+                Side::Buy => self
+                    .best_ask()
+                    .is_some_and(|best_ask| order.price >= *best_ask),
+
+                Side::Sell => self
+                    .best_bid()
+                    .is_some_and(|best_bid| order.price <= *best_bid),
+            };
+
+            if !crosses {
+                break;
+            }
+
+            let trade = self.match_at_best(&mut order);
+            events.push(trade);
         }
+
+        // Only rest whatever remains after matching.
+        if order.quantity > 0 {
+            self.store_order(order);
+        }
+
+        events
     }
 }
 

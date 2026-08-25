@@ -452,8 +452,56 @@ fn test_modify_order_unknown_id() {
     // Try to modify order that doesn't exist -> Should return `false`.
     let result = matching_engine.modify_order(1, 10002, 20);
 
-    assert!(matches!(
+    assert_eq!(
         result,
-        ExchangeEvent::ModificationFailed { order_id: 1 }
-    ));
+        vec![ExchangeEvent::ModificationFailed { order_id: 1 }]
+    );
+}
+
+#[test]
+fn prevent_modification_causing_crossing_books() {
+    let mut matching_engine = MatchingEngine::new();
+
+    let orders = [
+        Order {
+            id: 0,
+            price: 9998,
+            quantity: 15,
+            side: Side::Buy,
+        },
+        Order {
+            id: 1,
+            price: 10000,
+            quantity: 10,
+            side: Side::Sell,
+        },
+    ];
+
+    orders.into_iter().for_each(|order| {
+        matching_engine.submit_order(order);
+    });
+
+    let result = matching_engine.modify_order(0, 10002, 5);
+
+    assert_eq!(
+        result,
+        // Expected result
+        vec![
+            ExchangeEvent::OrderModified {
+                order_id: 0,
+                old_price: 9998,
+                new_price: 10002,
+                old_quantity: 15,
+                new_quantity: 5
+            },
+            ExchangeEvent::TradeExecuted {
+                incoming_order_id: 0,
+                resting_order_id: 1,
+                price: 10000,
+                quantity: 5,
+                incoming_remaining: 0,
+                resting_remaining: 5
+            }
+        ]
+    );
 }
