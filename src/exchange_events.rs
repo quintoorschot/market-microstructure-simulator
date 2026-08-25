@@ -1,4 +1,4 @@
-/// Represents events emitted by the matching engine in response to requests.
+/// Represents events that occurred because the matching engine processed the requests.
 #[derive(Debug, PartialEq)]
 pub enum ExchangeEvent {
     /// Represents a succesful trade execution.

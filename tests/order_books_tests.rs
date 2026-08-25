@@ -55,7 +55,7 @@ proptest! {
                 }
             });
         }
-        
+
         let expected_best_bid = orders
                                     .iter()
                                     .filter(|(_, is_buy)| *is_buy)

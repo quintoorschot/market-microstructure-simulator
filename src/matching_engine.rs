@@ -2,7 +2,7 @@ use crate::exchange_events::ExchangeEvent;
 use crate::order::{Order, Side};
 use crate::order_book::OrderBook;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct MatchingEngine {
     pub orderbook: OrderBook,
 }

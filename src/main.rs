@@ -1,14 +1,20 @@
+mod clock;
 mod exchange_events;
 mod matching_engine;
 mod order;
 mod order_book;
+mod simulation_events;
+mod simulator;
 mod trade;
 
 use exchange_events::*;
 use matching_engine::*;
 use order::*;
+use simulation_events::*;
+use simulator::*;
 
 fn main() {
+    let mut simulator = Simulator::new();
     let mut matching_engine = MatchingEngine::new();
 
     let order_1 = Order {
@@ -20,17 +26,19 @@ fn main() {
 
     let order_2 = Order {
         id: 2,
-        price: 10000,
-        quantity: 15,
+        price: 10002,
+        quantity: 10,
         side: Side::Sell,
     };
 
-    matching_engine.submit_order(order_1);
-    println!("Order 1 submitted!");
+    simulator.schedule(clock::SimTime(100), SimulationEvent::SubmitOrder(order_1));
+    simulator.schedule(clock::SimTime(110), SimulationEvent::SubmitOrder(order_2));
 
-    matching_engine.modify_order(100, 10005, 15);
-    // matching_engine.submit_order(order_2);
-    // println!("Order 2 submitted!");
+    // simulator.step();
+    // simulator.step();
+    simulator.run();
 
-    matching_engine.display_order_book();
+    simulator.matching_engine.display_order_book();
+
+    // println!("{:?}", simulator);
 }
