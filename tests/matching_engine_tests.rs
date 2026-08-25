@@ -483,6 +483,7 @@ fn prevent_modification_causing_crossing_books() {
 
     let result = matching_engine.modify_order(0, 10002, 5);
 
+    // Order should be modified and a trade between order 0 and order 1 should be executed.
     assert_eq!(
         result,
         // Expected result
