@@ -14,8 +14,8 @@ impl MatchingEngine {
         }
     }
 
-    pub fn submit_order(&mut self, mut order: Order) -> Vec<Trade> {
-        let mut trades: Vec<Trade> = Vec::new();
+    pub fn submit_order(&mut self, mut order: Order) -> Vec<ExchangeEvent> {
+        let mut trades: Vec<ExchangeEvent> = Vec::new();
 
         loop {
             // Nothing left to execute.

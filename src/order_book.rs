@@ -1,10 +1,10 @@
 use crate::{
+    exchange_events::ExchangeEvent,
     order::{Order, Side},
     trade::Trade,
-    exchange_events::ExchangeEvent,
 };
 use core::fmt;
-use std::{collections::BTreeMap};
+use std::collections::BTreeMap;
 
 /// Represents the location of an order in the order book (side -> price level -> index within price level)
 #[derive(Debug)]
@@ -37,17 +37,11 @@ impl OrderBook {
     pub fn store_order(&mut self, order: Order) {
         match &order.side {
             Side::Buy => {
-                self.bids
-                    .entry(order.price)
-                    .or_default()
-                    .push(order);
+                self.bids.entry(order.price).or_default().push(order);
             }
 
             Side::Sell => {
-                self.asks
-                    .entry(order.price)
-                    .or_default()
-                    .push(order);
+                self.asks.entry(order.price).or_default().push(order);
             }
         }
     }
@@ -62,101 +56,113 @@ impl OrderBook {
         self.asks.keys().next()
     }
 
-    pub(crate) fn match_at_best(&mut self, incoming: &mut Order) -> Trade {
+    pub(crate) fn match_at_best(&mut self, incoming: &mut Order) -> ExchangeEvent {
         match incoming.side {
             Side::Buy => self.match_against_asks(incoming),
             Side::Sell => self.match_against_bids(incoming),
         }
     }
 
-    fn match_against_asks(&mut self, incoming: &mut Order) -> Trade {
+    fn match_against_asks(&mut self, incoming: &mut Order) -> ExchangeEvent {
         let price = self
             .best_ask()
             .copied()
             .expect("match_against_asks called without asks in the order book.");
 
-        let (trade, remove_price_level) = {
+        let (resting_order_id, executed_quantity, resting_remaining, remove_price_level) = {
             let queue = self
                 .asks
                 .get_mut(&price)
                 .expect("Best ask price must exist in asks.");
 
-            let resting = queue
-                .first_mut()
-                .expect("Price level must have at least one resting order.");
+            let (resting_order_id, executed_quantity, resting_remaining) = {
+                let resting = queue
+                    .first_mut()
+                    .expect("Price level must have at least one resting order.");
 
-            let quantity = incoming.quantity.min(resting.quantity);
+                let executed_quantity = incoming.quantity.min(resting.quantity);
 
-            incoming.quantity -= quantity;
-            resting.quantity -= quantity;
+                incoming.quantity -= executed_quantity;
+                resting.quantity -= executed_quantity;
 
-            let trade = Trade {
-                incoming_order_id: incoming.id,
-                resting_order_id: resting.id,
-                price,
-                quantity,
+                (resting.id, executed_quantity, resting.quantity)
             };
 
-            // Remove 'resting' from queue when no longer needed.
-            if queue[0].quantity == 0 {
+            if resting_remaining == 0 {
                 queue.remove(0);
             }
 
-            let remove_price_level = queue.is_empty();
-
-            (trade, remove_price_level)
+            (
+                resting_order_id,
+                executed_quantity,
+                resting_remaining,
+                queue.is_empty(),
+            )
         };
 
         if remove_price_level {
             self.asks.remove(&price);
         }
 
-        trade
+        ExchangeEvent::TradeExecuted {
+            incoming_order_id: incoming.id,
+            resting_order_id,
+            price,
+            quantity: executed_quantity,
+            incoming_remaining: incoming.quantity,
+            resting_remaining,
+        }
     }
 
-    fn match_against_bids(&mut self, incoming: &mut Order) -> Trade {
+    fn match_against_bids(&mut self, incoming: &mut Order) -> ExchangeEvent {
         let price = self
             .best_bid()
             .copied()
             .expect("match_against_bids called without bids in the order book.");
 
-        let (trade, remove_price_level) = {
+        let (resting_order_id, executed_quantity, resting_remaining, remove_price_level) = {
             let queue = self
                 .bids
                 .get_mut(&price)
                 .expect("Best bid price must exist in bids.");
 
-            let resting = queue
-                .first_mut()
-                .expect("Price level must have at least one resting order.");
+            let (resting_order_id, executed_quantity, resting_remaining) = {
+                let resting = queue
+                    .first_mut()
+                    .expect("Price level must have at least one resting order.");
 
-            let quantity = incoming.quantity.min(resting.quantity);
+                let executed_quantity = incoming.quantity.min(resting.quantity);
 
-            incoming.quantity -= quantity;
-            resting.quantity -= quantity;
+                incoming.quantity -= executed_quantity;
+                resting.quantity -= executed_quantity;
 
-            let trade = Trade {
-                incoming_order_id: incoming.id,
-                resting_order_id: resting.id,
-                price,
-                quantity,
+                (resting.id, executed_quantity, resting.quantity)
             };
 
-            // Remove 'resting' from queue when no longer needed.
-            if queue[0].quantity == 0 {
+            if resting_remaining == 0 {
                 queue.remove(0);
             }
 
-            let remove_price_level = queue.is_empty();
-
-            (trade, remove_price_level)
+            (
+                resting_order_id,
+                executed_quantity,
+                resting_remaining,
+                queue.is_empty(),
+            )
         };
 
         if remove_price_level {
             self.bids.remove(&price);
         }
 
-        trade
+        ExchangeEvent::TradeExecuted {
+            incoming_order_id: incoming.id,
+            resting_order_id,
+            price,
+            quantity: executed_quantity,
+            incoming_remaining: incoming.quantity,
+            resting_remaining,
+        }
     }
 
     fn find_order(&self, id: u64) -> Option<OrderLocation> {
@@ -191,9 +197,7 @@ impl OrderBook {
 
     pub fn cancel_order(&mut self, id: u64) -> ExchangeEvent {
         let Some(location) = self.find_order(id) else {
-            return ExchangeEvent::CancellationRejected {
-                order_id: id
-            };
+            return ExchangeEvent::CancellationRejected { order_id: id };
         };
 
         let book = match location.side {
@@ -211,17 +215,12 @@ impl OrderBook {
             book.remove(&location.price);
         }
 
-        ExchangeEvent::OrderCancelled {
-            order_id: id
-        }
+        ExchangeEvent::OrderCancelled { order_id: id }
     }
 
     pub fn modify_order(&mut self, id: u64, new_price: i64, new_quantity: i64) -> ExchangeEvent {
-
         let Some(location) = self.find_order(id) else {
-            return ExchangeEvent::ModificationFailed {
-                order_id: id
-            };
+            return ExchangeEvent::ModificationFailed { order_id: id };
         };
 
         let book = match location.side {
@@ -254,9 +253,7 @@ impl OrderBook {
             order.price = new_price;
             order.quantity = new_quantity;
 
-            book.entry(new_price)
-                .or_default()
-                .push(order);
+            book.entry(new_price).or_default().push(order);
         }
 
         ExchangeEvent::OrderModified {
