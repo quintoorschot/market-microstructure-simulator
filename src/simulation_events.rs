@@ -10,4 +10,5 @@ pub struct EventKey {
 pub enum SimulationEvent {
     SubmitOrder(Order),
     CancelOrder(u64),
+    ModifyOrder(u64, u64, i64),
 }

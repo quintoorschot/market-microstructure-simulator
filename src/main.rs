@@ -33,6 +33,7 @@ fn main() {
 
     simulator.schedule(clock::SimTime(100), SimulationEvent::SubmitOrder(order_1));
     simulator.schedule(clock::SimTime(110), SimulationEvent::SubmitOrder(order_2));
+    simulator.schedule(clock::SimTime(120), SimulationEvent::ModifyOrder(1, 10003, 5));
 
     // simulator.step();
     // simulator.step();

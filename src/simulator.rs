@@ -42,6 +42,7 @@ impl Simulator {
             match event {
                 SimulationEvent::SubmitOrder(order) => { self.matching_engine.submit_order(order); },
                 SimulationEvent::CancelOrder(id) => { self.matching_engine.cancel_order(id); },
+                SimulationEvent::ModifyOrder(id, new_price, new_quantity) => { self.matching_engine.modify_order(id, new_price, new_quantity); },
             }
 
         } else {
