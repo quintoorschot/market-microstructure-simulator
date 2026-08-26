@@ -1,4 +1,4 @@
-use crate::{clock::SimTime, order::Order};
+use crate::{order::Order, simulator::clock::SimTime};
 
 #[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]
 pub struct EventKey {

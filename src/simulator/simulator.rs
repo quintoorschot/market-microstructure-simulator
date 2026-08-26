@@ -1,10 +1,10 @@
 use std::collections::BTreeMap;
 
 use crate::{
-    clock::SimTime,
     matching_engine::MatchingEngine,
     order_book::OrderBook,
-    simulation_events::{EventKey, SimulationEvent},
+    simulator::clock::SimTime,
+    simulator::simulation_events::{EventKey, SimulationEvent},
 };
 
 #[derive(Debug)]

@@ -1,9 +1,7 @@
-mod clock;
 mod exchange_events;
 mod matching_engine;
 mod order;
 mod order_book;
-mod simulation_events;
 mod simulator;
 mod trade;
 
@@ -14,7 +12,7 @@ use simulation_events::*;
 use simulator::*;
 
 fn main() {
-    let mut simulator = Simulator::new();
+    let mut simulator = simulator::Simulator::new();
     let mut matching_engine = MatchingEngine::new();
 
     let order_1 = Order {
