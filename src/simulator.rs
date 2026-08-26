@@ -2,11 +2,11 @@ use std::collections::BTreeMap;
 
 use crate::{
     clock::SimTime,
-    matching_engine::{self, MatchingEngine},
+    matching_engine::MatchingEngine,
     order_book::OrderBook,
     simulation_events::{
         EventKey,
-        SimulationEvent::{self, CancelOrder, SubmitOrder},
+        SimulationEvent::self,
     },
 };
 
@@ -39,10 +39,9 @@ impl Simulator {
 
     pub fn step(&mut self) {
         let current_event = self.queue.pop_first();
-        println!("{:?}", current_event);
 
         if let Some((key, event)) = current_event {
-            self.current_time = self.current_time.clone().max(key.time);
+            self.current_time = self.current_time.max(key.time);
 
             match event {
                 SimulationEvent::SubmitOrder(order) => {
@@ -56,9 +55,6 @@ impl Simulator {
                         .modify_order(id, new_price, new_quantity);
                 }
             }
-        } else {
-            println!("SIMULATION FINISHED!");
-            return;
         }
     }
 
@@ -71,5 +67,11 @@ impl Simulator {
             self.step();
             self.run();
         }
+    }
+}
+
+impl Default for Simulator {
+    fn default() -> Self {
+        Self::new()
     }
 }
