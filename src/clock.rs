@@ -9,8 +9,6 @@ impl SimTime {
     }
 
     pub fn add_nanos(self, nanos: u64) -> Self {
-        Self (
-            self.0.checked_add(nanos).expect("Simulation time overflow"),
-        )
+        Self(self.0.checked_add(nanos).expect("Simulation time overflow"))
     }
 }

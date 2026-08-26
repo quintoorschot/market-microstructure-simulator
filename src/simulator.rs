@@ -4,10 +4,7 @@ use crate::{
     clock::SimTime,
     matching_engine::MatchingEngine,
     order_book::OrderBook,
-    simulation_events::{
-        EventKey,
-        SimulationEvent::self,
-    },
+    simulation_events::{EventKey, SimulationEvent},
 };
 
 #[derive(Debug)]
