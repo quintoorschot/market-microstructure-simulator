@@ -1,5 +1,5 @@
 pub mod clock;
 pub mod simulation_events;
-pub mod simulator;
+mod simulator;
 
 pub use simulator::Simulator;
