@@ -33,13 +33,17 @@ fn main() {
 
     simulator.schedule(clock::SimTime(100), SimulationEvent::SubmitOrder(order_1));
     simulator.schedule(clock::SimTime(110), SimulationEvent::SubmitOrder(order_2));
-    simulator.schedule(clock::SimTime(120), SimulationEvent::ModifyOrder(1, 10003, 5));
+    simulator.schedule(
+        clock::SimTime(120),
+        SimulationEvent::ModifyOrder(1, 10003, 5),
+    );
 
     // simulator.step();
     // simulator.step();
     simulator.run();
 
-    simulator.matching_engine.display_order_book();
+    let orderbook = simulator.retrieve_order_book();
+    println!("{}", orderbook);
 
     // println!("{:?}", simulator);
 }

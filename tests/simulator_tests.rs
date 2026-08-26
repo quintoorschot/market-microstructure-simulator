@@ -1,0 +1,47 @@
+use market_microstructure_simulator::{
+    clock, order::{Order, Side}, order_book::OrderBook, simulation_events::SimulationEvent, simulator::Simulator,
+};
+
+#[test]
+pub fn test_schedule_submit_orders() {
+    let mut simulator = Simulator::new();
+
+    // Define orders to be scheduled.
+    let orders = [
+        Order {
+            id: 0,
+            price: 10002,
+            quantity: 25,
+            side: Side::Buy,
+        },
+        Order {
+            id: 1,
+            price: 10000,
+            quantity: 10,
+            side: Side::Sell,
+        },
+        Order {
+            id: 2,
+            price: 9999,
+            quantity: 5,
+            side: Side::Sell,
+        },
+    ];
+
+    // Schedule events in the simulator's queue.
+    orders.into_iter().for_each(|order| {
+        simulator.schedule(
+            clock::SimTime(order.id * 20),
+            SimulationEvent::SubmitOrder(order),
+        );
+    });
+
+    // Run the simulator until either the time limit is reached or the queue is empty.
+    simulator.run();
+
+    // After running the simulator, order book should contain remaining standing order.
+    let mut expected_orderbook = OrderBook::new();
+    expected_orderbook.store_order(Order { id: 0, price: 10002, quantity: 10, side: Side::Buy });
+
+    assert_eq!(*simulator.retrieve_order_book(), expected_orderbook);
+}
