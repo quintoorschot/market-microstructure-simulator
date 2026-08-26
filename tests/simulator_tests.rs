@@ -3,7 +3,7 @@ use market_microstructure_simulator::{
     order_book::OrderBook,
     simulator::clock,
     simulator::simulation_events::SimulationEvent,
-    simulator::simulator::Simulator,
+    simulator::Simulator,
 };
 
 #[test]
