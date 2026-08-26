@@ -6,10 +6,10 @@ pub enum ExchangeEvent {
         incoming_order_id: u64,
         resting_order_id: u64,
         price: u64,
-        quantity: i64,
+        quantity: u64,
 
-        incoming_remaining: i64,
-        resting_remaining: i64,
+        incoming_remaining: u64,
+        resting_remaining: u64,
     },
 
     /// Represents successful order cancellation.
@@ -23,8 +23,8 @@ pub enum ExchangeEvent {
         order_id: u64,
         old_price: u64,
         new_price: u64,
-        old_quantity: i64,
-        new_quantity: i64,
+        old_quantity: u64,
+        new_quantity: u64,
     },
 
     /// Represents failed order modification.

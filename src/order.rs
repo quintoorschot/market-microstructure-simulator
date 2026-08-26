@@ -22,7 +22,7 @@ pub struct Order {
     pub price: u64,
 
     /// Number of units the order is willing to buy or sell.
-    pub quantity: i64,
+    pub quantity: u64,
 
     /// indicates whether the order is a buy or sell.
     pub side: Side,

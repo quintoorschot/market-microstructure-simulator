@@ -221,7 +221,7 @@ impl OrderBook {
         &mut self,
         id: u64,
         new_price: u64,
-        new_quantity: i64,
+        new_quantity: u64,
     ) -> Vec<ExchangeEvent> {
         let Some(location) = self.find_order(id) else {
             return vec![ExchangeEvent::ModificationFailed { order_id: id }];
@@ -330,7 +330,7 @@ fn write_side(
     levels: &BTreeMap<u64, Vec<Order>>,
 ) -> fmt::Result {
     for (price, orders) in levels {
-        let total_quantity: i64 = orders.iter().map(|o| o.quantity).sum();
+        let total_quantity: u64 = orders.iter().map(|o| o.quantity).sum();
 
         writeln!(
             f,

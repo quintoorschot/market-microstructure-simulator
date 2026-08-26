@@ -63,7 +63,7 @@ impl MatchingEngine {
         &mut self,
         id: u64,
         new_price: u64,
-        new_quantity: i64,
+        new_quantity: u64,
     ) -> Vec<ExchangeEvent> {
         self.orderbook.modify_order(id, new_price, new_quantity)
     }
