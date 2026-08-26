@@ -36,6 +36,9 @@ pub fn test_schedule_submit_orders() {
         );
     });
 
+    // Simulator's order book should be empty before any events are ran.
+    assert_eq!(*simulator.retrieve_order_book(), OrderBook::new());
+
     // Run the simulator until either the time limit is reached or the queue is empty.
     simulator.run();
 
@@ -43,5 +46,6 @@ pub fn test_schedule_submit_orders() {
     let mut expected_orderbook = OrderBook::new();
     expected_orderbook.store_order(Order { id: 0, price: 10002, quantity: 10, side: Side::Buy });
 
+    // Compare the simulator's order book afer the simulation with what is to be expected.
     assert_eq!(*simulator.retrieve_order_book(), expected_orderbook);
 }
