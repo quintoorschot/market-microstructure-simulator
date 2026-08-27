@@ -51,6 +51,7 @@ impl Simulator {
                     self.matching_engine
                         .modify_order(id, new_price, new_quantity);
                 }
+                SimulationEvent::AgentWake(_) => todo!(),
             }
         }
     }

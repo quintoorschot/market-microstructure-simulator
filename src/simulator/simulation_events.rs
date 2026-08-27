@@ -8,6 +8,8 @@ pub struct EventKey {
 
 #[derive(Debug)]
 pub enum SimulationEvent {
+    AgentWake(u64),
+
     SubmitOrder(Order),
     CancelOrder(u64),
     ModifyOrder(u64, u64, u64),

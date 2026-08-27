@@ -1,9 +1,9 @@
 use market_microstructure_simulator::{
     order::{Order, Side},
     order_book::OrderBook,
+    simulator::Simulator,
     simulator::clock,
     simulator::simulation_events::SimulationEvent,
-    simulator::Simulator,
 };
 
 #[test]
