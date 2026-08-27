@@ -20,7 +20,7 @@ use crate::simulator::clock::SimTime;
 fn main() {
     let mut simulator = simulator::Simulator::new();
 
-    let noise_trader = NoiseTrader::new(0, 42, 10_000);
+    let noise_trader = NoiseTrader::new(0, 42, 10_000, 1_000);
 
     simulator.add_agent(noise_trader, SimTime(1000));
 

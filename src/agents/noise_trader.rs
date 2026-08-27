@@ -11,15 +11,17 @@ pub struct NoiseTrader {
     rng: StdRng,
     next_order_id: u64,
     reference_price: u64,
+    wake_interval: u64,
 }
 
 impl NoiseTrader {
-    pub fn new(id: u64, seed: u64, reference_price: u64) -> Self {
+    pub fn new(id: u64, seed: u64, reference_price: u64, wake_interval: u64) -> Self {
         Self {
             id,
             rng: StdRng::seed_from_u64(seed),
             next_order_id: 0,
             reference_price,
+            wake_interval,
         }
     }
 
@@ -62,7 +64,7 @@ impl Agent for NoiseTrader {
         let order = self.generate_order();
         vec![
             (now, SimulationEvent::SubmitOrder(order)),
-            (now.add_nanos(10000000), SimulationEvent::AgentWake(self.id)),
+            (now.add_nanos(self.wake_interval), SimulationEvent::AgentWake(self.id)),
         ]
     }
 }
