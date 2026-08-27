@@ -63,7 +63,6 @@ impl Simulator {
     pub fn run(&mut self) {
         while !self.queue.is_empty() {
             self.step();
-            self.run();
         }
     }
 }
