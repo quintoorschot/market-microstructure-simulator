@@ -20,13 +20,9 @@ use crate::simulator::clock::SimTime;
 fn main() {
     let mut simulator = simulator::Simulator::new();
 
-    let mut noise_trader = NoiseTrader::new(42, 10_000);
+    let noise_trader = NoiseTrader::new(0, 42, 10_000);
 
-    for i in 0..100 {
-        let order = noise_trader.generate_order();
-
-        simulator.schedule(SimTime(i * 1000), SimulationEvent::SubmitOrder(order));
-    }
+    simulator.add_agent(noise_trader, SimTime(1000));
 
     simulator.run();
 

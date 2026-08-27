@@ -1,10 +1,13 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 use crate::{
+    agents::agent::Agent,
     matching_engine::MatchingEngine,
     order_book::OrderBook,
-    simulator::clock::SimTime,
-    simulator::simulation_events::{EventKey, SimulationEvent},
+    simulator::{
+        clock::SimTime,
+        simulation_events::{EventKey, SimulationEvent},
+    },
 };
 
 #[derive(Debug)]
@@ -13,6 +16,8 @@ pub struct Simulator {
     current_time: SimTime,
     queue: BTreeMap<EventKey, SimulationEvent>,
     next_sequence: u64,
+    agents: HashMap<u64, Box<dyn Agent>>,
+    time_limit: SimTime,
 }
 
 impl Simulator {
@@ -22,6 +27,8 @@ impl Simulator {
             current_time: SimTime::ZERO,
             queue: BTreeMap::new(),
             next_sequence: 0,
+            agents: HashMap::new(),
+            time_limit: SimTime(1_000_000_000),
         }
     }
 
@@ -32,6 +39,20 @@ impl Simulator {
         };
         self.queue.insert(key, event);
         self.next_sequence += 1;
+    }
+
+    pub fn add_agent<A>(&mut self, agent: A, first_wake: SimTime)
+    where
+        A: Agent + 'static,
+    {
+        let id = agent.id();
+
+        self.agents.insert(id, Box::new(agent));
+
+        self.schedule(
+            first_wake,
+            SimulationEvent::AgentWake(id)
+        );
     }
 
     pub fn step(&mut self) {
@@ -51,7 +72,15 @@ impl Simulator {
                     self.matching_engine
                         .modify_order(id, new_price, new_quantity);
                 }
-                SimulationEvent::AgentWake(_) => todo!(),
+                SimulationEvent::AgentWake(id) => {
+                    let events = self.agents
+                        .get_mut(&id)
+                        .unwrap()
+                        .on_wakeup(self.current_time);
+                    for (schedule_time, event) in events.into_iter() {
+                        self.schedule(schedule_time, event);
+                    }
+                }
             }
         }
     }
@@ -61,7 +90,7 @@ impl Simulator {
     }
 
     pub fn run(&mut self) {
-        while !self.queue.is_empty() {
+        while !self.queue.is_empty() && self.current_time < self.time_limit {
             self.step();
         }
     }

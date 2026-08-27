@@ -1,15 +1,22 @@
-use crate::order::{Order, Side};
+use crate::{
+    agents::agent::Agent,
+    order::{Order, Side},
+    simulator::simulation_events::SimulationEvent,
+};
 use rand::{RngExt, SeedableRng, rngs::StdRng};
 
+#[derive(Debug)]
 pub struct NoiseTrader {
+    id: u64,
     rng: StdRng,
     next_order_id: u64,
     reference_price: u64,
 }
 
 impl NoiseTrader {
-    pub fn new(seed: u64, reference_price: u64) -> Self {
+    pub fn new(id: u64, seed: u64, reference_price: u64) -> Self {
         Self {
+            id,
             rng: StdRng::seed_from_u64(seed),
             next_order_id: 0,
             reference_price,
@@ -37,5 +44,25 @@ impl NoiseTrader {
         self.next_order_id += 1;
 
         order
+    }
+}
+
+impl Agent for NoiseTrader {
+    fn id(&self) -> u64 {
+        self.id
+    }
+
+    fn on_wakeup(
+        &mut self,
+        now: crate::simulator::clock::SimTime,
+    ) -> Vec<(
+        crate::simulator::clock::SimTime,
+        crate::simulator::simulation_events::SimulationEvent,
+    )> {
+        let order = self.generate_order();
+        vec![
+            (now, SimulationEvent::SubmitOrder(order)),
+            (now.add_nanos(10000000), SimulationEvent::AgentWake(self.id)),
+        ]
     }
 }
