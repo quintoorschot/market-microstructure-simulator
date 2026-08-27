@@ -1,10 +1,18 @@
 # 📈 Market Microstructure Simulator
 **A Rust-based limit order book and matching engine for simulating exchange-style market microstructure.**
 
-The project provides a foundation for exploring order matching, price-time priority, liquidity, and the mechanics of electronic financial markets.
+The project currently provides a limit order book, price-time-priority matching engine, event-driven simulation loop, and a simple trading agents.
 
-## ⚠️ Note
-This project is currently a work in progress. The core order book and matching engine are implemented, with additional market-microstructure functionality planned.
+## 🔎 Overview
+Market microstructure focuses on how orders interact, trades are formed, and prices emerge within financial markets.
+
+This project provides a foundation for exploring core market microstructure concepts, including:
+- **Limit order book (LOB):** separate bid/ask books with FIFO price-time priority.
+- **Matching engine:** supports partial fills and executions across multiple orders and price levels.
+- **Order management:** submit, cancel, and modify orders with automatic queue-priority handling.
+- **Discrete-event simulation:** process events deterministically by simulating time discretely.
+- **Exchange events:** report events such as trades, cancellations, modifications.
+- **Agent framework:** agents act autonomously, they submit orders schedule future actions based on current market conditions.
 
 ## ⚙️ Installation
 
