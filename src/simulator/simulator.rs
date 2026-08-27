@@ -49,10 +49,7 @@ impl Simulator {
 
         self.agents.insert(id, Box::new(agent));
 
-        self.schedule(
-            first_wake,
-            SimulationEvent::AgentWake(id)
-        );
+        self.schedule(first_wake, SimulationEvent::AgentWake(id));
     }
 
     pub fn step(&mut self) {
@@ -73,7 +70,8 @@ impl Simulator {
                         .modify_order(id, new_price, new_quantity);
                 }
                 SimulationEvent::AgentWake(id) => {
-                    let events = self.agents
+                    let events = self
+                        .agents
                         .get_mut(&id)
                         .unwrap()
                         .on_wakeup(self.current_time);

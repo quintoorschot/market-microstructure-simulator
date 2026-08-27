@@ -1,3 +1,4 @@
+use crate::simulator::clock::SimTime;
 use crate::{
     agents::agent::Agent,
     order::{Order, Side},
@@ -54,17 +55,14 @@ impl Agent for NoiseTrader {
         self.id
     }
 
-    fn on_wakeup(
-        &mut self,
-        now: crate::simulator::clock::SimTime,
-    ) -> Vec<(
-        crate::simulator::clock::SimTime,
-        crate::simulator::simulation_events::SimulationEvent,
-    )> {
+    fn on_wakeup(&mut self, now: SimTime) -> Vec<(SimTime, SimulationEvent)> {
         let order = self.generate_order();
         vec![
             (now, SimulationEvent::SubmitOrder(order)),
-            (now.add_nanos(self.wake_interval), SimulationEvent::AgentWake(self.id)),
+            (
+                now.add_nanos(self.wake_interval),
+                SimulationEvent::AgentWake(self.id),
+            ),
         ]
     }
 }
